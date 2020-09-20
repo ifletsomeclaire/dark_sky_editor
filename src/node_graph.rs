@@ -5,7 +5,7 @@ use bevy::{
 use noise::*;
 use utils::{NoiseMapBuilder, PlaneMapBuilder};
 
-use crate::bevy_lyon::basic_shapes::primitive;
+// use crate::bevy_lyon::basic_shapes::primitive;
 
 #[derive(Debug)]
 pub struct Graph {
