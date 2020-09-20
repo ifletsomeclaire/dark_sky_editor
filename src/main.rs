@@ -6,15 +6,15 @@ use bevy::{
     render::mesh::VertexAttribute,
     render::pipeline::PrimitiveTopology,
 };
-use bevy_lyon::{
-    basic_shapes::{primitive, ShapeType},
-    TessellationMode,
-};
+// use bevy_lyon::{
+//     basic_shapes::{primitive, ShapeType},
+//     TessellationMode,
+// };
 
-use lyon::{lyon_tessellation::FillOptions, lyon_tessellation::StrokeOptions, math::Point};
+// use lyon::{lyon_tessellation::FillOptions, lyon_tessellation::StrokeOptions, math::Point};
 use node_graph::Graph;
 
-mod bevy_lyon;
+// mod bevy_lyon;
 mod node_graph;
 
 struct MeshMaker {
