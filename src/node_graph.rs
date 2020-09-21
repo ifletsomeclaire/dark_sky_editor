@@ -41,14 +41,14 @@ impl Graph {
 #[derive(Debug)]
 pub struct Node {
     pub position: Vec2,
-    pub size: f32,
+    pub size: Vec2,
     pub texture: f32,
 }
 impl Node {
     fn new(position: Vec2, texture: f32) -> Self {
         Node {
             position,
-            size: 1.0,
+            size: vec2(5.0, 5.0),
             texture,
         }
     }

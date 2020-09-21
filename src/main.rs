@@ -1,21 +1,6 @@
-use bevy::{
-    diagnostic::{FrameTimeDiagnosticsPlugin, PrintDiagnosticsPlugin},
-    math::vec2,
-    math::vec3,
-    math::vec4,
-    prelude::*,
-    render::camera::PerspectiveProjection,
-    render::pipeline::DynamicBinding,
-    render::pipeline::PipelineDescriptor,
-    render::pipeline::PipelineSpecialization,
-    render::pipeline::RenderPipeline,
-    render::render_graph::base,
-    render::render_graph::AssetRenderResourcesNode,
-    render::render_graph::RenderGraph,
-    render::shader::asset_shader_defs_system,
-    render::shader::ShaderStage,
-    render::shader::ShaderStages,
-};
+use std::{fs::File, path::Path};
+
+use bevy::{asset::HandleId, asset::LoadState, diagnostic::{FrameTimeDiagnosticsPlugin, PrintDiagnosticsPlugin}, math::vec2, math::vec3, math::vec4, prelude::*, render::camera::PerspectiveProjection, render::pipeline::DynamicBinding, render::pipeline::PipelineDescriptor, render::pipeline::PipelineSpecialization, render::pipeline::RenderPipeline, render::render_graph::AssetRenderResourcesNode, render::render_graph::RenderGraph, render::render_graph::base, render::shader::ShaderStage, render::shader::ShaderStages, render::shader::asset_shader_defs_system, render::texture::TextureFormat, sprite::TextureAtlasBuilder};
 // use bevy_lyon::{
 //     basic_shapes::{primitive, ShapeType},
 //     TessellationMode,
@@ -23,6 +8,7 @@ use bevy::{
 
 // use lyon::{lyon_tessellation::FillOptions, lyon_tessellation::StrokeOptions, math::Point};
 use camera::{camera_movement, CameraMarker, MouseState};
+// use image::*;
 use material::MeshMaterial;
 use mesh::{EditableMesh, MeshMaker};
 use node_graph::{Graph, Ship};
@@ -34,7 +20,17 @@ mod mesh;
 mod node_graph;
 
 #[derive(Default, Debug)]
-struct MeshHandle(Handle<Mesh>);
+struct MeshHandle {
+    handle: Handle<Mesh>,
+    texture_atlas: Vec<HandleId>,
+}
+
+#[derive(Default)]
+pub struct RpgSpriteHandles {
+    handles: Vec<HandleId>,
+    atlas_loaded: bool,
+}
+
 
 fn main() {
     App::build()
@@ -42,12 +38,15 @@ fn main() {
         .add_default_plugins()
         .init_resource::<MouseState>()
         .init_resource::<MeshHandle>()
+        .init_resource::<RpgSpriteHandles>()
         .add_asset::<MeshMaterial>()
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(PrintDiagnosticsPlugin::default())
         .add_startup_system(setup.system())
+        .add_startup_system(ta_setup.system())
         .add_system(camera_movement.system())
         .add_system(move_ship.system())
+        .add_system(load_atlas.system())
         .add_system_to_stage(
             stage::POST_UPDATE,
             asset_shader_defs_system::<MeshMaterial>.system(),
@@ -65,9 +64,13 @@ fn setup(
     mut mesh_res: ResMut<MeshHandle>,
     mut pipelines: ResMut<Assets<PipelineDescriptor>>,
     mut shaders: ResMut<Assets<Shader>>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    mut textures: ResMut<Assets<Texture>>,
     mut render_graph: ResMut<RenderGraph>,
     mut materials: ResMut<Assets<MeshMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
+    mut cmaterials: ResMut<Assets<ColorMaterial>>,
+
 ) {
     let pipeline_handle = pipelines.add(PipelineDescriptor::default_config(ShaderStages {
         vertex: shaders.add(Shader::from_glsl(
@@ -192,7 +195,7 @@ fn setup(
 
         for meshmaker in &meshmakers {
             let mesh_handle = meshes.add(meshmaker.generate_mesh());
-            mesh_res.0 = mesh_handle;
+            mesh_res.handle = mesh_handle;
             commands
                 .spawn(MeshComponents {
                     mesh: mesh_handle,
@@ -204,13 +207,19 @@ fn setup(
     }
     // println!("mesh {:#?}", mesh);
 }
+fn ta_setup(mut rpg_sprite_handles: ResMut<RpgSpriteHandles>, asset_server: Res<AssetServer>) {
+    rpg_sprite_handles.handles = asset_server
+        .load_asset_folder("assets")
+        .unwrap();
+}
+
 
 fn move_ship(
     mut meshes: ResMut<Assets<Mesh>>,
     mesh_handle: Res<MeshHandle>,
     mut query: Query<&Ship>,
 ) {
-    if let Some(mesh) = meshes.get_mut(&mesh_handle.0) {
+    if let Some(mesh) = meshes.get_mut(&mesh_handle.handle) {
         if let Some(positions) = mesh.get_mut_vertex_positions() {
             for ship in &mut query.iter() {
                 // if ship.texture_index < 1.5 {
@@ -220,5 +229,59 @@ fn move_ship(
                 // }
             }
         }
+    }
+}
+
+fn load_atlas(
+    mut commands: Commands,
+    mut rpg_sprite_handles: ResMut<RpgSpriteHandles>,
+    asset_server: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    mut textures: ResMut<Assets<Texture>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+) {
+    if rpg_sprite_handles.atlas_loaded {
+        return;
+    }
+
+    let mut texture_atlas_builder = TextureAtlasBuilder::default();
+    if let Some(LoadState::Loaded(_)) =
+        asset_server.get_group_load_state(&rpg_sprite_handles.handles)
+    {
+        for texture_id in rpg_sprite_handles.handles.iter() {
+            let handle = Handle::from_id(*texture_id);
+            let texture = textures.get(&handle).unwrap();
+            texture_atlas_builder.add_texture(handle, &texture);
+        }
+
+        let texture_atlas = texture_atlas_builder.finish(&mut textures).unwrap();
+        let texture_atlas_texture = texture_atlas.texture;
+        let vendor_handle = asset_server
+            .get_handle("assets/flycatcher.png")
+            .unwrap();
+        let vendor_index = texture_atlas.get_texture_index(vendor_handle).unwrap();
+        let atlas_handle = texture_atlases.add(texture_atlas);
+
+        // set up a scene to display our texture atlas
+        commands
+            .spawn(SpriteSheetComponents {
+                transform: Transform::from_scale(4.0).with_translation(Vec3::new(150.0, 0.0, 0.0)),
+                sprite: TextureAtlasSprite::new(vendor_index as u32),
+                texture_atlas: atlas_handle,
+                ..Default::default()
+            })
+            // draw the atlas itself
+            .spawn(SpriteComponents {
+                material: materials.add(texture_atlas_texture.into()),
+                transform: Transform::from_translation(Vec3::new(-300.0, 0.0, 0.0)),
+                ..Default::default()
+            });
+
+        rpg_sprite_handles.atlas_loaded = true;
+
+        let texas = textures.get(&texture_atlas_texture).unwrap();
+        let fout = &mut File::create(&Path::new(&format!("texture_atlas.png"))).unwrap();
+        let encoder = image::png::PngEncoder::new(fout);
+        let ok = encoder.encode(&texas.data, texas.size.x() as u32, texas.size.y() as u32, image::ColorType::Rgba8);
     }
 }

@@ -1,4 +1,4 @@
-use bevy::{prelude::Mesh, render::mesh::Vertex, render::mesh::VertexAttribute, render::pipeline::PrimitiveTopology};
+use bevy::{prelude::Mesh, render::mesh::Vertex, render::mesh::VertexAttribute, render::mesh::VertexAttributeValues, render::pipeline::PrimitiveTopology};
 
 pub struct MeshMaker {
     pub vert_pos: Vec<[f32; 3]>,
@@ -110,3 +110,23 @@ impl EditableMesh for Mesh {
         }
     }
 }
+
+// pub trait NewVertexAttributes {
+//     fn color(colors: Vec<[f32; 4]>) -> VertexAttribute;
+//     fn texture(textures: Vec<f32>) -> VertexAttribute;
+// }
+
+// impl NewVertexAttributes for VertexAttribute {
+//     fn color(colors: Vec<[f32; 4]>) -> VertexAttribute {
+//         VertexAttribute {
+//             name: "Vertex_Color".into(),
+//             values: VertexAttributeValues::Float4(colors),
+//         }
+//     }
+//     fn texture(textures: Vec<f32>) -> VertexAttribute {
+//         VertexAttribute {
+//             name: "Vertex_Texture".into(),
+//             values: VertexAttributeValues::Float(textures),
+//         }
+//     }
+// }

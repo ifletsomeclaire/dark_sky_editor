@@ -8,5 +8,6 @@ edition = "2018"
 
 [dependencies]
 bevy = { path = "C:/Users/bad wife/Desktop/bevy" }
-lyon = "0.16.0"
+# lyon = "0.16.0"
 noise = "*"
+image = "0.23.9"
