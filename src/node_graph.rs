@@ -1,11 +1,8 @@
 use bevy::{
-    math::{vec2, Vec2, Vec3},
-    prelude::Commands,
+    math::{vec2, Vec2},
 };
 use noise::*;
 use utils::{NoiseMapBuilder, PlaneMapBuilder};
-
-// use crate::bevy_lyon::basic_shapes::primitive;
 
 #[derive(Debug)]
 pub struct Graph {
@@ -13,7 +10,7 @@ pub struct Graph {
     pub connections: Vec<Connection>,
 }
 impl Graph {
-    pub fn new(node_count: i32, width: i32, height: i32, seed: u32) -> Self {
+    pub fn new(_node_count: i32, width: i32, height: i32, seed: u32) -> Self {
         let mut nodes = Vec::new();
         let mut connections = Vec::new();
 
@@ -26,21 +23,16 @@ impl Graph {
 
         for h in (-height)..(height) {
             for w in (-width)..(width) {
-                // println!("noise: {}", noise.get([(w as f64) / 0.2, (h as f64) / 0.8]));
                 if map.get_value((w+width) as usize, (h+height) as usize) > 0.0 {
-                    nodes.push(Node::new(vec2((w*6) as f32, (h*6) as f32)));
+                    nodes.push(Node::new(vec2((w*6) as f32, (h*6) as f32), if h > w {1.0} else {2.0}));
                 }
-                // if noise.get([(w as f64) * 0.754275, (h as f64) * 0.428]) > 0.0 {
-                //     nodes.push(Node::new(vec2((w * 2) as f32, (h * 2) as f32)));
-                // }
             }
         }
-        // for (i, _node) in nodes.iter().enumerate() {
-        //     if i + 1 != nodes.len() {
-        //         connections.push(Connection(i as i32, (i + 1) as i32))
-        //     }
-        // }
-
+        for (i, _node) in nodes.iter().enumerate() {
+            if i + 1 != nodes.len() {
+                connections.push(Connection(i as i32, (i + 1) as i32))
+            }
+        }
         Self { nodes, connections }
     }
 }
@@ -49,13 +41,14 @@ impl Graph {
 pub struct Node {
     pub position: Vec2,
     pub size: f32,
+    pub texture: f32,
 }
-// all nodes are circles
 impl Node {
-    fn new(position: Vec2) -> Self {
+    fn new(position: Vec2, texture: f32) -> Self {
         Node {
             position,
             size: 1.0,
+            texture,
         }
     }
 }

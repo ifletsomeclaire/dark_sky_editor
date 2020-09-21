@@ -1,4 +1,20 @@
-use bevy::{diagnostic::{FrameTimeDiagnosticsPlugin, PrintDiagnosticsPlugin}, math::vec2, math::vec4, prelude::*, render::camera::PerspectiveProjection, render::pipeline::DynamicBinding, render::pipeline::PipelineDescriptor, render::pipeline::PipelineSpecialization, render::pipeline::RenderPipeline, render::render_graph::AssetRenderResourcesNode, render::render_graph::RenderGraph, render::render_graph::base, render::shader::ShaderStage, render::shader::ShaderStages, render::shader::asset_shader_defs_system};
+use bevy::{
+    diagnostic::{FrameTimeDiagnosticsPlugin, PrintDiagnosticsPlugin},
+    math::vec2,
+    math::vec4,
+    prelude::*,
+    render::camera::PerspectiveProjection,
+    render::pipeline::DynamicBinding,
+    render::pipeline::PipelineDescriptor,
+    render::pipeline::PipelineSpecialization,
+    render::pipeline::RenderPipeline,
+    render::render_graph::base,
+    render::render_graph::AssetRenderResourcesNode,
+    render::render_graph::RenderGraph,
+    render::shader::asset_shader_defs_system,
+    render::shader::ShaderStage,
+    render::shader::ShaderStages,
+};
 // use bevy_lyon::{
 //     basic_shapes::{primitive, ShapeType},
 //     TessellationMode,
@@ -6,9 +22,9 @@ use bevy::{diagnostic::{FrameTimeDiagnosticsPlugin, PrintDiagnosticsPlugin}, mat
 
 // use lyon::{lyon_tessellation::FillOptions, lyon_tessellation::StrokeOptions, math::Point};
 use camera::{camera_movement, CameraMarker, MouseState};
-use mesh::MeshMaker;
-use node_graph::Graph;
 use material::MeshMaterial;
+use mesh::{EditableMesh, MeshMaker};
+use node_graph::Graph;
 
 // mod bevy_lyon;
 mod camera;
@@ -82,13 +98,8 @@ fn setup(
         },
     )]);
 
-
-    let texture_handle = asset_server.load("assets/flycatcher.png").unwrap();
-    // commands.spawn(PbrComponents {
-    //     mesh: meshes.add(Mesh::from(shape::Quad{ size: vec2(200. , 200. ), flip: false})),
-    //     material: materials.add(texture_handle.into()),
-    //     ..Default::default()
-    // });
+    let fly_handle = asset_server.load("assets/flycatcher.png").unwrap();
+    let quail_handle = asset_server.load("assets/quail-color.png").unwrap();
 
     commands
         .spawn(Camera3dComponents {
@@ -107,22 +118,13 @@ fn setup(
 
     let material = materials.add(MeshMaterial {
         basecolor: Color::from(vec4(1.0, 1.0, 1.0, 1.0)),
-        texture: Some(texture_handle),
-        shaded: true,
+        texture1: Some(fly_handle),
+        texture2: Some(quail_handle),
+        shaded: false,
         // ..Default::default()
     });
-    // let green_mat = materials.add(Color::rgb(0.3, 0.4, 0.3).into());
-    // let red_mat = materials.add(Color::rgb(0.8, 0.0, 0.0).into());
-    // let blue_mat = materials.add(Color::rgb(0.1, 0.4, 0.5).into());
 
     for seed in 1..2 {
-        // let mut material = mat;
-        // if seed % 3 == 0 {
-        //     material = blue_mat;
-        // } else if seed % 2 == 0 {
-        //     material = red_mat;
-        // }
-
         let graph = Graph::new(10, 50, 50, seed);
         println!("nodes: {}", graph.nodes.len());
         let mut meshmakers = Vec::new();
@@ -135,32 +137,29 @@ fn setup(
                 flip: false,
             });
             // positions
-            match quad.attributes[0].values {
-                bevy::render::mesh::VertexAttributeValues::Float3(ref qval) => {
-                    for q in qval {
-                        let pos = [node.position.x() + q[0], node.position.y() + q[1], 0.0];
-                        m_maker.vert_pos.push(pos);
-                    }
-                }
-                _ => {}
+            for position in quad.get_vertex_positions().unwrap() {
+                let pos = [
+                    node.position.x() + position[0],
+                    node.position.y() + position[1],
+                    0.0,
+                ];
+                m_maker.vert_pos.push(pos);
             }
             // normals
-            match quad.attributes[1].values {
-                bevy::render::mesh::VertexAttributeValues::Float3(ref qval) => {
-                    for q in qval {
-                        m_maker.vert_norm.push(q.clone());
-                    }
-                }
-                _ => {}
+            for norm in quad.get_vertex_normals().unwrap() {
+                m_maker.vert_norm.push(norm);
             }
             // uvs
-            match quad.attributes[2].values {
-                bevy::render::mesh::VertexAttributeValues::Float2(ref qval) => {
-                    for q in qval {
-                        m_maker.vert_uvs.push(q.clone());
-                    }
-                }
-                _ => {}
+            for uv in quad.get_vertex_uvs().unwrap() {
+                m_maker.vert_uvs.push(uv);
+            }
+            // colors
+            for color in quad.get_vertex_colors().unwrap() {
+                m_maker.vert_colors.push(color);
+            }
+            // texture index
+            for _ in quad.get_vertex_textures().unwrap() {
+                m_maker.vert_textures.push(node.texture);
             }
             for ind in quad.indices.unwrap() {
                 m_maker.indices.push(ind + count as u32);
@@ -174,85 +173,16 @@ fn setup(
         }
         meshmakers.push(m_maker);
         println!("meshmakers: {}", meshmakers.len());
-        // println!("vert: {}", positions.len());
-        // println!("normal: {}", normals.len());
-        // println!("uv: {}", uvs.len());
-        // println!("indices: {}", indices.len());
 
         for meshmaker in &meshmakers {
-            commands.spawn(MeshComponents {
-                mesh: meshes.add(meshmaker.generate_mesh()),
-                render_pipelines: specialized_pipeline.clone(),
-                ..Default::default()
-            }).with(material);
+            commands
+                .spawn(MeshComponents {
+                    mesh: meshes.add(meshmaker.generate_mesh()),
+                    render_pipelines: specialized_pipeline.clone(),
+                    ..Default::default()
+                })
+                .with(material);
         }
     }
     // println!("mesh {:#?}", mesh);
-
-    // for node in &graph.nodes {
-    //     commands.spawn(primitive(
-    //         material,
-    //         &mut meshes,
-    //         ShapeType::Circle(node.size),
-    //         TessellationMode::Fill(&FillOptions::default()),
-    //         Transform::from_translation(vec3(node.position.x(), node.position.y(), 0.0)),
-    //     ));
-    // }
-    // for connection in &graph.connections {
-    //     commands.spawn(primitive(
-    //         material,
-    //         &mut meshes,
-    //         ShapeType::Polyline {
-    //             points: vec![
-    //                 Point {
-    //                     x: graph.nodes[connection.0 as usize].position.x(),
-    //                     y: graph.nodes[connection.0 as usize].position.y(),
-    //                     ..Default::default()
-    //                 },
-    //                 Point {
-    //                     x: graph.nodes[connection.1 as usize].position.x(),
-    //                     y: graph.nodes[connection.1 as usize].position.y(),
-    //                     ..Default::default()
-    //                 },
-    //             ],
-    //             closed: false,
-    //         },
-    //         TessellationMode::Stroke(&StrokeOptions::default().with_line_width(8.0)),
-    //         Transform::default(),
-    //     ));
-    // }
-
-    // commands
-    //     .spawn(primitive(
-    //         material,
-    //         &mut meshes,
-    //         ShapeType::Circle(40.0),
-    //         TessellationMode::Stroke(&StrokeOptions::default().with_line_width(8.0)),
-    //         Transform::from_translation(vec3(-50.0, 0.0, 0.0)),
-    //     ))
-    //     .spawn(primitive(
-    //         material,
-    //         &mut meshes,
-    //         ShapeType::Circle(40.0),
-    //         TessellationMode::Stroke(&StrokeOptions::default().with_line_width(8.0)),
-    //         Transform::from_translation(vec3(50.0, 0.0, 0.0)),
-    //     ))
-    //     .spawn(primitive(
-    //         material,
-    //         &mut meshes,
-    //         ShapeType::Polyline {
-    //             points: vec![Point {
-    //                 x: -10.0,
-    //                 y: 0.0,
-    //                 ..Default::default()
-    //             }, Point {
-    //                 x: 10.0,
-    //                 y: 0.0,
-    //                 ..Default::default()
-    //             }],
-    //             closed: false,
-    //         },
-    //         TessellationMode::Stroke(&StrokeOptions::default().with_line_width(8.0)),
-    //         Transform::default(),
-    //     ));
 }

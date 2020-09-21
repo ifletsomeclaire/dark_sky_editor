@@ -11,6 +11,8 @@ struct Light {
 layout(location = 0) in vec3 v_Position;
 layout(location = 1) in vec3 v_Normal;
 layout(location = 2) in vec2 v_Uv;
+layout(location = 3) in vec4 v_Color;
+layout(location = 4) in float v_Texture;
 
 layout(location = 0) out vec4 o_Target;
 
@@ -27,18 +29,30 @@ layout(set = 3, binding = 0) uniform MeshMaterial_basecolor {
     vec4 Albedo;
 };
 
-# ifdef MESHMATERIAL_TEXTURE
-layout(set = 3, binding = 1) uniform texture2D MeshMaterial_texture;
-layout(set = 3, binding = 2) uniform sampler MeshMaterial_texture_sampler;
+# ifdef MESHMATERIAL_TEXTURE1
+layout(set = 3, binding = 1) uniform texture2D MeshMaterial_texture1;
+layout(set = 3, binding = 2) uniform sampler MeshMaterial_texture1_sampler;
+# endif
+# ifdef MESHMATERIAL_TEXTURE2
+layout(set = 3, binding = 3) uniform texture2D MeshMaterial_texture2;
+layout(set = 3, binding = 4) uniform sampler MeshMaterial_texture2_sampler;
 # endif
 
 void main() {
     vec4 output_color = Albedo;
-# ifdef MESHMATERIAL_TEXTURE
-    output_color *= texture(
-        sampler2D(MeshMaterial_texture, MeshMaterial_texture_sampler),
-        v_Uv);
-# endif
+if (v_Texture < 1.1) {
+    # ifdef MESHMATERIAL_TEXTURE1
+        output_color *= texture(
+            sampler2D(MeshMaterial_texture1, MeshMaterial_texture1_sampler),
+            v_Uv);
+    # endif
+} else if (v_Texture < 2.1) {
+    # ifdef MESHMATERIAL_TEXTURE2
+        output_color *= texture(
+            sampler2D(MeshMaterial_texture2, MeshMaterial_texture2_sampler),
+            v_Uv);
+    # endif
+}
 
 # ifdef MESHMATERIAL_SHADED
     vec3 normal = normalize(v_Normal);
