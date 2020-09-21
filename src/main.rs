@@ -1,10 +1,8 @@
 use bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin, PrintDiagnosticsPlugin},
     math::vec2,
-    math::vec3,
     prelude::*,
-    render::mesh::VertexAttribute,
-    render::pipeline::PrimitiveTopology,
+    render::camera::PerspectiveProjection,
 };
 // use bevy_lyon::{
 //     basic_shapes::{primitive, ShapeType},
@@ -12,37 +10,15 @@ use bevy::{
 // };
 
 // use lyon::{lyon_tessellation::FillOptions, lyon_tessellation::StrokeOptions, math::Point};
+use camera::{camera_movement, CameraMarker, MouseState};
+use mesh::MeshMaker;
 use node_graph::Graph;
 
 // mod bevy_lyon;
+mod camera;
+mod material;
+mod mesh;
 mod node_graph;
-
-struct MeshMaker {
-    vert_pos: Vec<[f32; 3]>,
-    vert_norm: Vec<[f32; 3]>,
-    vert_uvs: Vec<[f32; 2]>,
-    indices: Vec<u32>,
-}
-impl MeshMaker {
-    fn new() -> Self {
-        MeshMaker {
-            vert_pos: Vec::new(),
-            vert_norm: Vec::new(),
-            vert_uvs: Vec::new(),
-            indices: Vec::new(),
-        }
-    }
-    fn generate_mesh(&self) -> Mesh {
-        let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-        mesh.indices = Some(self.indices.clone());
-        mesh.attributes
-            .push(VertexAttribute::position(self.vert_pos.clone()));
-        mesh.attributes
-            .push(VertexAttribute::normal(self.vert_norm.clone()));
-        mesh.attributes.push(VertexAttribute::uv(self.vert_uvs.clone()));
-        mesh
-    }
-}
 
 fn main() {
     App::build()
@@ -50,93 +26,126 @@ fn main() {
         .add_default_plugins()
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(PrintDiagnosticsPlugin::default())
+        .init_resource::<MouseState>()
         .add_startup_system(setup.system())
+        .add_system(camera_movement.system())
         .run();
 }
 
+// TODO
+// Generate Quad with texture references on vertex points (see if you can import a texture on vertex??)
+// Connect 2D texture to Quad so that we can connect multiple different textures
+
 fn setup(
     mut commands: Commands,
+    asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
 ) {
-    commands.spawn(Camera2dComponents::default());
+    let texture_handle = asset_server.load("assets/flycatcher.png").unwrap();
+    // commands.spawn(PbrComponents {
+    //     mesh: meshes.add(Mesh::from(shape::Quad{ size: vec2(200. , 200. ), flip: false})),
+    //     material: materials.add(texture_handle.into()),
+    //     ..Default::default()
+    // });
 
+    commands
+        .spawn(Camera3dComponents {
+            transform: Transform::new(Mat4::face_toward(
+                Vec3::new(0.0, -0.01, 150.0),
+                Vec3::new(0.0, 0.0, 0.0),
+                Vec3::new(0.0, 0.0, 1.0),
+            )),
+            perspective_projection: PerspectiveProjection {
+                far: 200000.,
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .with(CameraMarker);
+
+    let material = materials.add(StandardMaterial {
+        // albedo: Color::from(vec4(0.3, 0.4, 0.3, 1.0)),
+        albedo_texture: Some(texture_handle),
+        // shaded: true,
+        ..Default::default()
+    });
     let green_mat = materials.add(Color::rgb(0.3, 0.4, 0.3).into());
     let red_mat = materials.add(Color::rgb(0.8, 0.0, 0.0).into());
     let blue_mat = materials.add(Color::rgb(0.1, 0.4, 0.5).into());
 
-for seed in 0..1 {
-    let mut material = green_mat;
-    if seed % 3 == 0 {
-        material = blue_mat;
-    } else if seed % 2 == 0 {
-        material = red_mat;
-    }
+    for seed in 1..2 {
+        // let mut material = mat;
+        // if seed % 3 == 0 {
+        //     material = blue_mat;
+        // } else if seed % 2 == 0 {
+        //     material = red_mat;
+        // }
 
-    let graph = Graph::new(10, 400, 400, seed);
-    println!("nodes: {}", graph.nodes.len());
-    let mut meshmakers = Vec::new();
-    let mut m_maker = MeshMaker::new();
-    let mut count = 0;
+        let graph = Graph::new(10, 50, 50, seed);
+        println!("nodes: {}", graph.nodes.len());
+        let mut meshmakers = Vec::new();
+        let mut m_maker = MeshMaker::new();
+        let mut count = 0;
 
-    for node in &graph.nodes {
-        let quad = Mesh::from(shape::Quad {
-            size: vec2(1.0, 1.0),
-            flip: false,
-        });
-        // positions
-        match quad.attributes[0].values {
-            bevy::render::mesh::VertexAttributeValues::Float3(ref qval) => {
-                for q in qval {
-                    let pos = [node.position.x() + q[0], node.position.y() + q[1], 0.0];
-                    m_maker.vert_pos.push(pos);
+        for node in &graph.nodes {
+            let quad = Mesh::from(shape::Quad {
+                size: vec2(5.0, 5.0),
+                flip: false,
+            });
+            // positions
+            match quad.attributes[0].values {
+                bevy::render::mesh::VertexAttributeValues::Float3(ref qval) => {
+                    for q in qval {
+                        let pos = [node.position.x() + q[0], node.position.y() + q[1], 0.0];
+                        m_maker.vert_pos.push(pos);
+                    }
                 }
+                _ => {}
             }
-            _ => {}
-        }
-        // normals
-        match quad.attributes[1].values {
-            bevy::render::mesh::VertexAttributeValues::Float3(ref qval) => {
-                for q in qval {
-                    m_maker.vert_norm.push(q.clone());
+            // normals
+            match quad.attributes[1].values {
+                bevy::render::mesh::VertexAttributeValues::Float3(ref qval) => {
+                    for q in qval {
+                        m_maker.vert_norm.push(q.clone());
+                    }
                 }
+                _ => {}
             }
-            _ => {}
-        }
-        // uvs
-        match quad.attributes[2].values {
-            bevy::render::mesh::VertexAttributeValues::Float2(ref qval) => {
-                for q in qval {
-                    m_maker.vert_uvs.push(q.clone());
+            // uvs
+            match quad.attributes[2].values {
+                bevy::render::mesh::VertexAttributeValues::Float2(ref qval) => {
+                    for q in qval {
+                        m_maker.vert_uvs.push(q.clone());
+                    }
                 }
+                _ => {}
             }
-            _ => {}
+            for ind in quad.indices.unwrap() {
+                m_maker.indices.push(ind + count as u32);
+            }
+            count += 4;
+            if count > 64000 {
+                meshmakers.push(m_maker);
+                m_maker = MeshMaker::new();
+                count = 0;
+            }
         }
-        for ind in quad.indices.unwrap() {
-            m_maker.indices.push(ind + count as u32);
-        }
-        count += 4;
-        if count > 64000 {
-            meshmakers.push(m_maker);
-            m_maker = MeshMaker::new();
-            count = 0;
+        meshmakers.push(m_maker);
+        println!("meshmakers: {}", meshmakers.len());
+        // println!("vert: {}", positions.len());
+        // println!("normal: {}", normals.len());
+        // println!("uv: {}", uvs.len());
+        // println!("indices: {}", indices.len());
+
+        for meshmaker in &meshmakers {
+            commands.spawn(PbrComponents {
+                mesh: meshes.add(meshmaker.generate_mesh()),
+                material: material,
+                ..Default::default()
+            });
         }
     }
-    meshmakers.push(m_maker);
-    println!("meshmakers: {}", meshmakers.len());
-    // println!("vert: {}", positions.len());
-    // println!("normal: {}", normals.len());
-    // println!("uv: {}", uvs.len());
-    // println!("indices: {}", indices.len());
-
-    for meshmaker in &meshmakers {
-        commands.spawn(PbrComponents {
-            mesh: meshes.add(meshmaker.generate_mesh()),
-            material: material,
-            ..Default::default()
-        });
-    }
-}
     // println!("mesh {:#?}", mesh);
 
     // for node in &graph.nodes {

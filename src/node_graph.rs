@@ -20,15 +20,15 @@ impl Graph {
         let noise = noise::Perlin::new().set_seed(seed);
         let map = PlaneMapBuilder::new(&noise)
             .set_size(10000, 10000)
-            .set_x_bounds(-50.0, 50.0)
-            .set_y_bounds(-50.0, 50.0)
+            .set_x_bounds(-500.0, 500.0)
+            .set_y_bounds(-500.0, 500.0)
             .build();
 
         for h in (-height)..(height) {
             for w in (-width)..(width) {
                 // println!("noise: {}", noise.get([(w as f64) / 0.2, (h as f64) / 0.8]));
                 if map.get_value((w+width) as usize, (h+height) as usize) > 0.0 {
-                    nodes.push(Node::new(vec2((w) as f32, (h) as f32)));
+                    nodes.push(Node::new(vec2((w*6) as f32, (h*6) as f32)));
                 }
                 // if noise.get([(w as f64) * 0.754275, (h as f64) * 0.428]) > 0.0 {
                 //     nodes.push(Node::new(vec2((w * 2) as f32, (h * 2) as f32)));
