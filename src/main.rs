@@ -1,9 +1,4 @@
-use bevy::{
-    diagnostic::{FrameTimeDiagnosticsPlugin, PrintDiagnosticsPlugin},
-    math::vec2,
-    prelude::*,
-    render::camera::PerspectiveProjection,
-};
+use bevy::{diagnostic::{FrameTimeDiagnosticsPlugin, PrintDiagnosticsPlugin}, math::vec2, math::vec4, prelude::*, render::camera::PerspectiveProjection, render::pipeline::DynamicBinding, render::pipeline::PipelineDescriptor, render::pipeline::PipelineSpecialization, render::pipeline::RenderPipeline, render::render_graph::AssetRenderResourcesNode, render::render_graph::RenderGraph, render::render_graph::base, render::shader::ShaderStage, render::shader::ShaderStages, render::shader::asset_shader_defs_system};
 // use bevy_lyon::{
 //     basic_shapes::{primitive, ShapeType},
 //     TessellationMode,
@@ -13,6 +8,7 @@ use bevy::{
 use camera::{camera_movement, CameraMarker, MouseState};
 use mesh::MeshMaker;
 use node_graph::Graph;
+use material::MeshMaterial;
 
 // mod bevy_lyon;
 mod camera;
@@ -24,11 +20,16 @@ fn main() {
     App::build()
         .add_resource(Msaa { samples: 4 })
         .add_default_plugins()
+        .init_resource::<MouseState>()
+        .add_asset::<MeshMaterial>()
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(PrintDiagnosticsPlugin::default())
-        .init_resource::<MouseState>()
         .add_startup_system(setup.system())
         .add_system(camera_movement.system())
+        .add_system_to_stage(
+            stage::POST_UPDATE,
+            asset_shader_defs_system::<MeshMaterial>.system(),
+        )
         .run();
 }
 
@@ -39,9 +40,49 @@ fn main() {
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut pipelines: ResMut<Assets<PipelineDescriptor>>,
+    mut shaders: ResMut<Assets<Shader>>,
+    mut render_graph: ResMut<RenderGraph>,
+    mut materials: ResMut<Assets<MeshMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
 ) {
+    let pipeline_handle = pipelines.add(PipelineDescriptor::default_config(ShaderStages {
+        vertex: shaders.add(Shader::from_glsl(
+            ShaderStage::Vertex,
+            include_str!("../shaders/forward.vert"),
+        )),
+        fragment: Some(shaders.add(Shader::from_glsl(
+            ShaderStage::Fragment,
+            include_str!("../shaders/forward.frag"),
+        ))),
+    }));
+    render_graph.add_system_node(
+        "mesh_material",
+        AssetRenderResourcesNode::<MeshMaterial>::new(true),
+    );
+    render_graph
+        .add_node_edge("mesh_material", base::node::MAIN_PASS)
+        .unwrap();
+    let specialized_pipeline = RenderPipelines::from_pipelines(vec![RenderPipeline::specialized(
+        pipeline_handle,
+        PipelineSpecialization {
+            dynamic_bindings: vec![
+                // Transform
+                DynamicBinding {
+                    bind_group: 2,
+                    binding: 0,
+                },
+                // MeshMaterial_basecolor
+                DynamicBinding {
+                    bind_group: 3,
+                    binding: 0,
+                },
+            ],
+            ..Default::default()
+        },
+    )]);
+
+
     let texture_handle = asset_server.load("assets/flycatcher.png").unwrap();
     // commands.spawn(PbrComponents {
     //     mesh: meshes.add(Mesh::from(shape::Quad{ size: vec2(200. , 200. ), flip: false})),
@@ -64,15 +105,15 @@ fn setup(
         })
         .with(CameraMarker);
 
-    let material = materials.add(StandardMaterial {
-        // albedo: Color::from(vec4(0.3, 0.4, 0.3, 1.0)),
-        albedo_texture: Some(texture_handle),
-        // shaded: true,
-        ..Default::default()
+    let material = materials.add(MeshMaterial {
+        basecolor: Color::from(vec4(1.0, 1.0, 1.0, 1.0)),
+        texture: Some(texture_handle),
+        shaded: true,
+        // ..Default::default()
     });
-    let green_mat = materials.add(Color::rgb(0.3, 0.4, 0.3).into());
-    let red_mat = materials.add(Color::rgb(0.8, 0.0, 0.0).into());
-    let blue_mat = materials.add(Color::rgb(0.1, 0.4, 0.5).into());
+    // let green_mat = materials.add(Color::rgb(0.3, 0.4, 0.3).into());
+    // let red_mat = materials.add(Color::rgb(0.8, 0.0, 0.0).into());
+    // let blue_mat = materials.add(Color::rgb(0.1, 0.4, 0.5).into());
 
     for seed in 1..2 {
         // let mut material = mat;
@@ -139,11 +180,11 @@ fn setup(
         // println!("indices: {}", indices.len());
 
         for meshmaker in &meshmakers {
-            commands.spawn(PbrComponents {
+            commands.spawn(MeshComponents {
                 mesh: meshes.add(meshmaker.generate_mesh()),
-                material: material,
+                render_pipelines: specialized_pipeline.clone(),
                 ..Default::default()
-            });
+            }).with(material);
         }
     }
     // println!("mesh {:#?}", mesh);
