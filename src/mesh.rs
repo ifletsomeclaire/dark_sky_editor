@@ -1,4 +1,7 @@
-use bevy::{prelude::Mesh, render::mesh::Vertex, render::mesh::VertexAttribute, render::mesh::VertexAttributeValues, render::pipeline::PrimitiveTopology};
+use bevy::{
+    prelude::Mesh, render::mesh::Vertex, render::mesh::VertexAttribute,
+    render::mesh::VertexAttributeValues, render::pipeline::PrimitiveTopology,
+};
 
 pub struct MeshMaker {
     pub vert_pos: Vec<[f32; 3]>,
@@ -35,7 +38,6 @@ impl MeshMaker {
         mesh
     }
 }
-
 
 pub trait EditableMesh {
     fn get_vertex_positions(&self) -> Option<Vec<[f32; 3]>>;

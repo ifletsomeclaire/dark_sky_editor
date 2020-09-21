@@ -27,10 +27,7 @@ pub fn camera_movement(
             for event in state.mouse_motion_event_reader.iter(&mouse_move) {
                 for (_, mut trans) in &mut query.iter() {
                     let rot = trans.rotation();
-                    trans.translate(rot.mul_vec3(vec3(
-                        
-                        
-                        -event.delta[0], event.delta[1], 0.0)))
+                    trans.translate(rot.mul_vec3(vec3(-event.delta[0], event.delta[1], 0.0)))
                 }
             }
         }
@@ -50,4 +47,3 @@ pub fn camera_movement(
         }
     }
 }
-

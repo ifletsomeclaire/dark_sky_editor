@@ -1,0 +1,28 @@
+[
+    AtlasInfo {
+        filepath: "assets\\flycatcher.png",
+        rect: Rect {
+            min: Vec2(
+                0.0,
+                0.0,
+            ),
+            max: Vec2(
+                40.0,
+                80.0,
+            ),
+        },
+    },
+    AtlasInfo {
+        filepath: "assets\\quail-color.png",
+        rect: Rect {
+            min: Vec2(
+                40.0,
+                0.0,
+            ),
+            max: Vec2(
+                88.0,
+                48.0,
+            ),
+        },
+    },
+]

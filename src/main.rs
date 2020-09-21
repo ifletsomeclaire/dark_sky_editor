@@ -1,6 +1,27 @@
-use std::{fs::File, path::Path};
+use std::{fs::File, io::Write, path::Path};
 
-use bevy::{asset::HandleId, asset::LoadState, diagnostic::{FrameTimeDiagnosticsPlugin, PrintDiagnosticsPlugin}, math::vec2, math::vec3, math::vec4, prelude::*, render::camera::PerspectiveProjection, render::pipeline::DynamicBinding, render::pipeline::PipelineDescriptor, render::pipeline::PipelineSpecialization, render::pipeline::RenderPipeline, render::render_graph::AssetRenderResourcesNode, render::render_graph::RenderGraph, render::render_graph::base, render::shader::ShaderStage, render::shader::ShaderStages, render::shader::asset_shader_defs_system, render::texture::TextureFormat, sprite::TextureAtlasBuilder};
+use bevy::{
+    asset::HandleId,
+    asset::LoadState,
+    diagnostic::{FrameTimeDiagnosticsPlugin, PrintDiagnosticsPlugin},
+    math::vec2,
+    math::vec3,
+    math::vec4,
+    prelude::*,
+    render::camera::PerspectiveProjection,
+    render::pipeline::DynamicBinding,
+    render::pipeline::PipelineDescriptor,
+    render::pipeline::PipelineSpecialization,
+    render::pipeline::RenderPipeline,
+    render::render_graph::base,
+    render::render_graph::AssetRenderResourcesNode,
+    render::render_graph::RenderGraph,
+    render::shader::asset_shader_defs_system,
+    render::shader::ShaderStage,
+    render::shader::ShaderStages,
+    render::texture::TextureFormat,
+    sprite::TextureAtlasBuilder,
+};
 // use bevy_lyon::{
 //     basic_shapes::{primitive, ShapeType},
 //     TessellationMode,
@@ -30,7 +51,6 @@ pub struct RpgSpriteHandles {
     handles: Vec<HandleId>,
     atlas_loaded: bool,
 }
-
 
 fn main() {
     App::build()
@@ -70,7 +90,6 @@ fn setup(
     mut materials: ResMut<Assets<MeshMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut cmaterials: ResMut<Assets<ColorMaterial>>,
-
 ) {
     let pipeline_handle = pipelines.add(PipelineDescriptor::default_config(ShaderStages {
         vertex: shaders.add(Shader::from_glsl(
@@ -208,11 +227,8 @@ fn setup(
     // println!("mesh {:#?}", mesh);
 }
 fn ta_setup(mut rpg_sprite_handles: ResMut<RpgSpriteHandles>, asset_server: Res<AssetServer>) {
-    rpg_sprite_handles.handles = asset_server
-        .load_asset_folder("assets")
-        .unwrap();
+    rpg_sprite_handles.handles = asset_server.load_asset_folder("assets").unwrap();
 }
-
 
 fn move_ship(
     mut meshes: ResMut<Assets<Mesh>>,
@@ -223,9 +239,9 @@ fn move_ship(
         if let Some(positions) = mesh.get_mut_vertex_positions() {
             for ship in &mut query.iter() {
                 // if ship.texture_index < 1.5 {
-                    for index in ship.vert_indices.clone() {
-                        positions[index as usize][0] -= 0.1;
-                    }
+                for index in ship.vert_indices.clone() {
+                    positions[index as usize][0] -= 0.1;
+                }
                 // }
             }
         }
@@ -256,32 +272,68 @@ fn load_atlas(
 
         let texture_atlas = texture_atlas_builder.finish(&mut textures).unwrap();
         let texture_atlas_texture = texture_atlas.texture;
-        let vendor_handle = asset_server
-            .get_handle("assets/flycatcher.png")
-            .unwrap();
-        let vendor_index = texture_atlas.get_texture_index(vendor_handle).unwrap();
         let atlas_handle = texture_atlases.add(texture_atlas);
 
         // set up a scene to display our texture atlas
-        commands
-            .spawn(SpriteSheetComponents {
-                transform: Transform::from_scale(4.0).with_translation(Vec3::new(150.0, 0.0, 0.0)),
-                sprite: TextureAtlasSprite::new(vendor_index as u32),
-                texture_atlas: atlas_handle,
-                ..Default::default()
-            })
-            // draw the atlas itself
-            .spawn(SpriteComponents {
-                material: materials.add(texture_atlas_texture.into()),
-                transform: Transform::from_translation(Vec3::new(-300.0, 0.0, 0.0)),
-                ..Default::default()
-            });
+        // let vendor_handle = asset_server
+        //     .get_handle("assets/flycatcher.png")
+        //     .unwrap();
+        // let vendor_index = texture_atlas.get_texture_index(vendor_handle).unwrap();
+        // commands
+        //     .spawn(SpriteSheetComponents {
+        //         transform: Transform::from_scale(4.0).with_translation(Vec3::new(150.0, 0.0, 0.0)),
+        //         sprite: TextureAtlasSprite::new(vendor_index as u32),
+        //         texture_atlas: atlas_handle,
+        //         ..Default::default()
+        //     })
+        //     // draw the atlas itself
+        //     .spawn(SpriteComponents {
+        //         material: materials.add(texture_atlas_texture.into()),
+        //         transform: Transform::from_translation(Vec3::new(-300.0, 0.0, 0.0)),
+        //         ..Default::default()
+        //     });
 
         rpg_sprite_handles.atlas_loaded = true;
 
         let texas = textures.get(&texture_atlas_texture).unwrap();
+        let texatlas = texture_atlases.get(&atlas_handle).unwrap();
         let fout = &mut File::create(&Path::new(&format!("texture_atlas.png"))).unwrap();
         let encoder = image::png::PngEncoder::new(fout);
-        let ok = encoder.encode(&texas.data, texas.size.x() as u32, texas.size.y() as u32, image::ColorType::Rgba8);
+        let ok = encoder.encode(
+            &texas.data,
+            texas.size.x() as u32,
+            texas.size.y() as u32,
+            image::ColorType::Rgba8,
+        );
+
+        let mut atlas_infos = Vec::new();
+        let rects = &texatlas.textures;
+        // for (h, u) in texatlas.texture_handles.as_ref().unwrap() {
+        //     atlas_infos.push(AtlasInfo { filepath: format!("{:?}", h), rect: rects[u.to_owned()].clone()})
+        // }
+        for entry in walkdir::WalkDir::new("assets")
+            .into_iter()
+            .filter_map(|e| e.ok())
+        {
+            println!("{}", entry.path().display());
+            if let Some(v_handle) = asset_server.get_handle(entry.path()) {
+                if let Some(v_index) = texatlas.get_texture_index(v_handle) {
+                    atlas_infos.push(AtlasInfo {
+                        filepath: format!("{}", entry.path().display()),
+                        rect: rects[v_index],
+                    })
+                }
+            }
+        }
+        let outputfile = &mut File::create(&Path::new(&format!("texture_atlas.txt"))).unwrap();
+        outputfile
+            .write_all(format!("{:#?}", atlas_infos).as_bytes())
+            .expect("else");
     }
+}
+
+#[derive(Debug)]
+struct AtlasInfo {
+    filepath: String,
+    rect: bevy::sprite::Rect,
 }
