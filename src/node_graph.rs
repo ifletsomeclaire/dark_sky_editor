@@ -1,6 +1,4 @@
-use bevy::{
-    math::{vec2, Vec2},
-};
+use bevy::math::{vec2, Vec2};
 use noise::*;
 use utils::{NoiseMapBuilder, PlaneMapBuilder};
 
@@ -23,8 +21,11 @@ impl Graph {
 
         for h in (-height)..(height) {
             for w in (-width)..(width) {
-                if map.get_value((w+width) as usize, (h+height) as usize) > 0.0 {
-                    nodes.push(Node::new(vec2((w*6) as f32, (h*6) as f32), if h > w {1.0} else {2.0}));
+                if map.get_value((w + width) as usize, (h + height) as usize) > 0.0 {
+                    nodes.push(Node::new(
+                        vec2((w * 6) as f32, (h * 6) as f32),
+                        if h > w { 1.0 } else { 2.0 },
+                    ));
                 }
             }
         }
@@ -55,3 +56,8 @@ impl Node {
 
 #[derive(Debug)]
 pub struct Connection(pub i32, pub i32);
+
+pub struct Ship {
+    pub vert_indices: std::ops::Range<u32>,
+    pub texture_index: f32,
+}

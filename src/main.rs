@@ -1,6 +1,7 @@
 use bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin, PrintDiagnosticsPlugin},
     math::vec2,
+    math::vec3,
     math::vec4,
     prelude::*,
     render::camera::PerspectiveProjection,
@@ -24,7 +25,7 @@ use bevy::{
 use camera::{camera_movement, CameraMarker, MouseState};
 use material::MeshMaterial;
 use mesh::{EditableMesh, MeshMaker};
-use node_graph::Graph;
+use node_graph::{Graph, Ship};
 
 // mod bevy_lyon;
 mod camera;
@@ -32,16 +33,21 @@ mod material;
 mod mesh;
 mod node_graph;
 
+#[derive(Default, Debug)]
+struct MeshHandle(Handle<Mesh>);
+
 fn main() {
     App::build()
         .add_resource(Msaa { samples: 4 })
         .add_default_plugins()
         .init_resource::<MouseState>()
+        .init_resource::<MeshHandle>()
         .add_asset::<MeshMaterial>()
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(PrintDiagnosticsPlugin::default())
         .add_startup_system(setup.system())
         .add_system(camera_movement.system())
+        .add_system(move_ship.system())
         .add_system_to_stage(
             stage::POST_UPDATE,
             asset_shader_defs_system::<MeshMaterial>.system(),
@@ -56,6 +62,7 @@ fn main() {
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    mut mesh_res: ResMut<MeshHandle>,
     mut pipelines: ResMut<Assets<PipelineDescriptor>>,
     mut shaders: ResMut<Assets<Shader>>,
     mut render_graph: ResMut<RenderGraph>,
@@ -164,8 +171,17 @@ fn setup(
             for ind in quad.indices.unwrap() {
                 m_maker.indices.push(ind + count as u32);
             }
+
+            commands.spawn((
+                Ship {
+                    vert_indices: count..(count + 4),
+                    texture_index: node.texture,
+                },
+                // Transform::from_translation(vec3(node.position.x(), node.position.y(), 0.0)),
+            ));
+
             count += 4;
-            if count > 64000 {
+            if count >= 64000 {
                 meshmakers.push(m_maker);
                 m_maker = MeshMaker::new();
                 count = 0;
@@ -175,9 +191,11 @@ fn setup(
         println!("meshmakers: {}", meshmakers.len());
 
         for meshmaker in &meshmakers {
+            let mesh_handle = meshes.add(meshmaker.generate_mesh());
+            mesh_res.0 = mesh_handle;
             commands
                 .spawn(MeshComponents {
-                    mesh: meshes.add(meshmaker.generate_mesh()),
+                    mesh: mesh_handle,
                     render_pipelines: specialized_pipeline.clone(),
                     ..Default::default()
                 })
@@ -185,4 +203,22 @@ fn setup(
         }
     }
     // println!("mesh {:#?}", mesh);
+}
+
+fn move_ship(
+    mut meshes: ResMut<Assets<Mesh>>,
+    mesh_handle: Res<MeshHandle>,
+    mut query: Query<&Ship>,
+) {
+    if let Some(mesh) = meshes.get_mut(&mesh_handle.0) {
+        if let Some(positions) = mesh.get_mut_vertex_positions() {
+            for ship in &mut query.iter() {
+                // if ship.texture_index < 1.5 {
+                    for index in ship.vert_indices.clone() {
+                        positions[index as usize][0] -= 0.1;
+                    }
+                // }
+            }
+        }
+    }
 }
