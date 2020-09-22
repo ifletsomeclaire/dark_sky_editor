@@ -11,9 +11,13 @@ layout(location = 1) out vec3 v_Normal;
 layout(location = 2) out vec2 v_Uv;
 layout(location = 3) out vec4 v_Color;
 layout(location = 4) out float v_Texture;
+layout(location = 5) out float v_Lod;
 
 layout(set = 0, binding = 0) uniform Camera {
     mat4 ViewProj;
+};
+layout(set = 3, binding = 1) uniform MeshMaterial_distance {
+    float distance;
 };
 
 layout(set = 2, binding = 0) uniform Transform {
@@ -27,5 +31,6 @@ void main() {
     v_Uv = Vertex_Uv;
     v_Color = Vertex_Color;
     v_Texture = Vertex_Texture;
+    v_Lod = distance;
     gl_Position = ViewProj * vec4(v_Position, 1.0);
 }

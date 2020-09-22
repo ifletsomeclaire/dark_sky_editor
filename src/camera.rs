@@ -1,10 +1,13 @@
 use bevy::{input::mouse::MouseMotion, input::mouse::MouseWheel, math::vec3, prelude::*};
 
+use crate::{Handles, material::GlobalMaterial, material::MeshMaterial};
+
 #[derive(Default)]
 pub struct MouseState {
     pub mouse_motion_event_reader: EventReader<MouseMotion>,
     pub mouse_wheel_event_reader: EventReader<MouseWheel>,
 }
+#[derive(Debug, Default)]
 pub struct CameraMarker;
 
 pub fn camera_movement(
@@ -44,6 +47,21 @@ pub fn camera_movement(
                 let rot = trans.rotation();
                 trans.translate(rot.mul_vec3(vec3(0.0, 0.0, -event.y * 10.)))
             }
+        }
+    }
+}
+
+pub fn update_camera_distance(
+    handle_res: Res<Handles>,
+    // mut globalmat: ResMut<Assets<GlobalMaterial>>,
+    mut meshmat: ResMut<Assets<MeshMaterial>>,
+    mut query: Query<(&CameraMarker, &Transform)>,
+) {
+    if let Some(m_mat) = meshmat.get_mut(&handle_res.ship_texture_mat) {
+        for (_, transform) in &mut query.iter() {
+            // g_mat.distance = transform.translation().z();
+            m_mat.distance = transform.translation().z();
+            println!("distance: {}", m_mat.distance);
         }
     }
 }

@@ -11,13 +11,12 @@ use bevy::{
     render::render_graph::base,
     render::render_graph::AssetRenderResourcesNode,
     render::render_graph::RenderGraph,
-    render::shader::asset_shader_defs_system,
     render::shader::ShaderStage,
     render::shader::ShaderStages,
 };
 
-use camera::{camera_movement, CameraMarker, MouseState};
-use material::MeshMaterial;
+use camera::{camera_movement, update_camera_distance, CameraMarker, MouseState};
+use material::{GlobalMaterial, MeshMaterial};
 use mesh::{EditableMesh, MeshMaker};
 use node_graph::{Graph, Ship};
 use texture_atlas::{load_atlas, ta_setup, AtlasInfo, AtlasSpriteHandles};
@@ -31,8 +30,10 @@ mod node_graph;
 mod texture_atlas;
 
 #[derive(Default, Debug)]
-struct MeshHandle {
-    handle: Handle<Mesh>,
+pub struct Handles {
+    pub mesh_handle: Handle<Mesh>,
+    pub ship_texture_mat: Handle<MeshMaterial>,
+    pub global_mat: Handle<GlobalMaterial>,
 }
 
 fn main() {
@@ -40,19 +41,21 @@ fn main() {
         .add_resource(Msaa { samples: 4 })
         .add_default_plugins()
         .init_resource::<MouseState>()
-        .init_resource::<MeshHandle>()
+        .init_resource::<Handles>()
         // .init_resource::<AtlasSpriteHandles>()
         .add_asset::<MeshMaterial>()
+        .add_asset::<GlobalMaterial>()
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(PrintDiagnosticsPlugin::default())
         .add_startup_system(setup.system())
         // .add_startup_system(ta_setup.system())
         // .add_system(load_atlas.system())
         .add_system(camera_movement.system())
-        // .add_system(move_ship.system())
+        .add_system(update_camera_distance.system())
+        .add_system(move_ship.system())
         .add_system_to_stage(
             stage::POST_UPDATE,
-            asset_shader_defs_system::<MeshMaterial>.system(),
+            bevy::render::shader::asset_shader_defs_system::<MeshMaterial>.system(),
         )
         .run();
 }
@@ -64,22 +67,25 @@ fn main() {
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut mesh_res: ResMut<MeshHandle>,
+    mut handle_res: ResMut<Handles>,
     mut pipelines: ResMut<Assets<PipelineDescriptor>>,
     mut shaders: ResMut<Assets<Shader>>,
     mut render_graph: ResMut<RenderGraph>,
     mut materials: ResMut<Assets<MeshMaterial>>,
+    mut globalmat: ResMut<Assets<GlobalMaterial>>,
     mut textures: ResMut<Assets<Texture>>,
     mut meshes: ResMut<Assets<Mesh>>,
 ) {
+    handle_res.global_mat = globalmat.add(GlobalMaterial { distance: 0.0 });
+
     let pipeline_handle = pipelines.add(PipelineDescriptor::default_config(ShaderStages {
         vertex: shaders.add(Shader::from_glsl(
             ShaderStage::Vertex,
-            include_str!("../shaders/forward simple.vert"),
+            include_str!("../shaders/forward.vert"),
         )),
         fragment: Some(shaders.add(Shader::from_glsl(
             ShaderStage::Fragment,
-            include_str!("../shaders/forward simple.frag"),
+            include_str!("../shaders/forward.frag"),
         ))),
     }));
     render_graph.add_system_node(
@@ -103,6 +109,11 @@ fn setup(
                     bind_group: 3,
                     binding: 0,
                 },
+                // MeshMaterial_distance
+                DynamicBinding {
+                    bind_group: 3,
+                    binding: 1,
+                },
             ],
             ..Default::default()
         },
@@ -111,7 +122,7 @@ fn setup(
     commands
         .spawn(Camera3dComponents {
             transform: Transform::new(Mat4::face_toward(
-                Vec3::new(0.0, -0.01, 150.0),
+                Vec3::new(0.0, -0.01, 2000.0),
                 Vec3::new(0.0, 0.0, 0.0),
                 Vec3::new(0.0, 0.0, 1.0),
             )),
@@ -129,24 +140,24 @@ fn setup(
     }
     println!("{:?}", texture_handles);
 
-    for h in texture_handles {
-        commands
-            .spawn(MeshComponents {
-                mesh: meshes.add(Mesh::from(shape::Quad {
-                    size: vec2(100., 100.),
-                    flip: false,
-                })),
-                render_pipelines: specialized_pipeline.clone(),
-                ..Default::default()
-            })
-            .with(materials.add(MeshMaterial {
-                basecolor: Color::from(vec4(1.0, 1.0, 1.0, 1.0)),
-                texture1: Some(h),
-                shaded: false,
-            }));
-    }
+    // for h in texture_handles {
+    // commands
+    //     .spawn(MeshComponents {
+    //         mesh: meshes.add(Mesh::from(shape::Quad {
+    //             size: vec2(100., 100.),
+    //             flip: false,
+    //         })),
+    //         render_pipelines: specialized_pipeline.clone(),
+    //         ..Default::default()
+    //     })
+    //     .with(materials.add(MeshMaterial {
+    //         basecolor: Color::from(vec4(1.0, 1.0, 1.0, 1.0)),
+    //         texture1: Some(texture_handles[4]),
+    //         shaded: false,
+    //     }));
+    // }
 
-    let atlas_handle = asset_server.load("assets/texture_atlas.png").unwrap();
+    // let atlas_handle = asset_server.load("assets/texture_atlas.png").unwrap();
     // let fly_handle = asset_server.load("assets/ship/model 512.png").unwrap();
     // let quail_handle = asset_server.load("assets/quail-color.png").unwrap();
 
@@ -159,11 +170,15 @@ fn setup(
 
     let material = materials.add(MeshMaterial {
         basecolor: Color::from(vec4(1.0, 1.0, 1.0, 1.0)),
-        texture1: Some(atlas_handle),
-        // texture1: Some(texture_handles[0]),
-        // texture2: None,
+        texture1: Some(texture_handles[0]),
+        texture2: Some(texture_handles[1]),
+        texture3: Some(texture_handles[2]),
+        texture4: Some(texture_handles[3]),
+        texture5: Some(texture_handles[4]),
         shaded: false,
+        distance: 0.0,
     });
+    handle_res.ship_texture_mat = material;
 
     let mut z_value: f32 = 0.0;
     for seed in 1..2 {
@@ -175,10 +190,6 @@ fn setup(
 
         for node in &graph.nodes {
             let rect = atlas_info.textures[node.texture as usize].rect;
-            // let quad = Mesh::from(shape::Quad {
-            //     size: vec2(340., 380.),
-            //     flip: false,
-            // });
             let quad = Mesh::from(shape::Quad {
                 size: vec2(rect.max[0] - rect.min[0], rect.max[1] - rect.min[1]),
                 flip: false,
@@ -212,14 +223,14 @@ fn setup(
                 m_maker.vert_uvs.push([x, y]);
                 // m_maker.vert_uvs.push(uv);
             }
-            // // colors
-            // for color in quad.get_vertex_colors().unwrap() {
-            //     m_maker.vert_colors.push(color);
-            // }
-            // // texture index
-            // for _ in quad.get_vertex_textures().unwrap() {
-            //     m_maker.vert_textures.push(1.0);
-            // }
+            // colors
+            for color in quad.get_vertex_colors().unwrap() {
+                m_maker.vert_colors.push(color);
+            }
+            // texture index
+            for _ in quad.get_vertex_textures().unwrap() {
+                m_maker.vert_textures.push(1.0);
+            }
             for ind in quad.indices.unwrap() {
                 m_maker.indices.push(ind + count as u32);
             }
@@ -241,7 +252,7 @@ fn setup(
 
         for meshmaker in &meshmakers {
             let mesh_handle = meshes.add(meshmaker.generate_mesh());
-            mesh_res.handle = mesh_handle;
+            handle_res.mesh_handle = mesh_handle;
             commands
                 .spawn(MeshComponents {
                     mesh: mesh_handle,
@@ -252,17 +263,14 @@ fn setup(
                     },
                     ..Default::default()
                 })
+                .with(handle_res.global_mat)
                 .with(material);
         }
     }
 }
 
-fn move_ship(
-    mut meshes: ResMut<Assets<Mesh>>,
-    mesh_handle: Res<MeshHandle>,
-    mut query: Query<&Ship>,
-) {
-    if let Some(mesh) = meshes.get_mut(&mesh_handle.handle) {
+fn move_ship(mut meshes: ResMut<Assets<Mesh>>, handles: Res<Handles>, mut query: Query<&Ship>) {
+    if let Some(mesh) = meshes.get_mut(&handles.mesh_handle) {
         if let Some(positions) = mesh.get_mut_vertex_positions() {
             for ship in &mut query.iter() {
                 // if ship.texture_index < 1.5 {

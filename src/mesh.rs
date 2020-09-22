@@ -28,10 +28,10 @@ impl MeshMaker {
             .push(VertexAttribute::normal(self.vert_norm.clone()));
         mesh.attributes
             .push(VertexAttribute::uv(self.vert_uvs.clone()));
-        // mesh.attributes
-        //     .push(VertexAttribute::color(self.vert_colors.clone()));
-        // mesh.attributes
-        //     .push(VertexAttribute::texture(self.vert_textures.clone()));
+        mesh.attributes
+            .push(VertexAttribute::color(self.vert_colors.clone()));
+        mesh.attributes
+            .push(VertexAttribute::texture(self.vert_textures.clone()));
         mesh
     }
 }
