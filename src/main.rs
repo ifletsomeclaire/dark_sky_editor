@@ -121,7 +121,7 @@ fn setup(
             ..Default::default()
         })
         .with(CameraMarker);
-        
+
     let atlas_handle = asset_server.load("assets/texture_atlas.png").unwrap();
     // let fly_handle = asset_server.load("assets/flycatcher.png").unwrap();
     // let quail_handle = asset_server.load("assets/quail-color.png").unwrap();
@@ -170,8 +170,16 @@ fn setup(
             }
             // uvs
             for uv in quad.get_vertex_uvs().unwrap() {
-                let x = if uv[0] < 0.01 { rect.min[0] / atlas_size[0] } else { rect.max[0] / atlas_size[0] };
-                let y = if uv[1] < 0.01 { rect.min[1] / atlas_size[1] } else { rect.max[1] / atlas_size[1] };
+                let x = if uv[0] < 0.01 {
+                    rect.min[0] / atlas_size[0]
+                } else {
+                    rect.max[0] / atlas_size[0]
+                };
+                let y = if uv[1] < 0.01 {
+                    rect.min[1] / atlas_size[1]
+                } else {
+                    rect.max[1] / atlas_size[1]
+                };
                 m_maker.vert_uvs.push([x, y]);
                 // m_maker.vert_uvs.push(uv);
             }

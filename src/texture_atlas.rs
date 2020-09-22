@@ -1,5 +1,5 @@
+use ron::{de::from_reader, ser::to_string_pretty, ser::PrettyConfig};
 use serde::{Deserialize, Serialize};
-use ron::{de::from_reader, ser::PrettyConfig, ser::to_string_pretty};
 use std::{fs::File, io::Write, path::Path};
 
 use bevy::{
@@ -138,10 +138,7 @@ impl AtlasInfo {
         let pretty = PrettyConfig::new();
         let s = to_string_pretty(self, pretty).expect("Serialization failed");
         let outputfile = &mut File::create(&Path::new(&format!("texture_atlas.ron"))).unwrap();
-        outputfile
-            .write_all(s.as_bytes())
-            .expect("else");
-
+        outputfile.write_all(s.as_bytes()).expect("else");
     }
 }
 #[derive(Debug, Deserialize, Serialize)]

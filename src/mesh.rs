@@ -1,7 +1,4 @@
-use bevy::{
-    prelude::Mesh, render::mesh::VertexAttribute,
-    render::pipeline::PrimitiveTopology,
-};
+use bevy::{prelude::Mesh, render::mesh::VertexAttribute, render::pipeline::PrimitiveTopology};
 
 pub struct MeshMaker {
     pub vert_pos: Vec<[f32; 3]>,

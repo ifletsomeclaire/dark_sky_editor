@@ -1,7 +1,7 @@
 use bevy::math::{vec2, Vec2};
 use noise::*;
-use utils::{NoiseMapBuilder, PlaneMapBuilder};
 use rand::Rng;
+use utils::{NoiseMapBuilder, PlaneMapBuilder};
 
 use crate::texture_atlas::Rectangle;
 
@@ -27,7 +27,7 @@ impl Graph {
             for w in (-width)..(width) {
                 if map.get_value((w + width) as usize, (h + height) as usize) > 0.0 {
                     nodes.push(Node::new(
-                        vec2((w * 60) as f32, (h * 60) as f32),
+                        vec2((w * 500) as f32, (h * 500) as f32),
                         rng.gen_range(0, 228),
                         // 1,
                     ));
