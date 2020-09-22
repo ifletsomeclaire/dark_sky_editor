@@ -1,6 +1,9 @@
 use bevy::math::{vec2, Vec2};
 use noise::*;
 use utils::{NoiseMapBuilder, PlaneMapBuilder};
+use rand::Rng;
+
+use crate::texture_atlas::Rectangle;
 
 #[derive(Debug)]
 pub struct Graph {
@@ -9,6 +12,7 @@ pub struct Graph {
 }
 impl Graph {
     pub fn new(_node_count: i32, width: i32, height: i32, seed: u32) -> Self {
+        let mut rng = rand::thread_rng();
         let mut nodes = Vec::new();
         let mut connections = Vec::new();
 
@@ -23,8 +27,9 @@ impl Graph {
             for w in (-width)..(width) {
                 if map.get_value((w + width) as usize, (h + height) as usize) > 0.0 {
                     nodes.push(Node::new(
-                        vec2((w * 6) as f32, (h * 6) as f32),
-                        if h > w { 1.0 } else { 2.0 },
+                        vec2((w * 60) as f32, (h * 60) as f32),
+                        rng.gen_range(0, 228),
+                        // 1,
                     ));
                 }
             }
@@ -41,14 +46,14 @@ impl Graph {
 #[derive(Debug)]
 pub struct Node {
     pub position: Vec2,
-    pub size: Vec2,
-    pub texture: f32,
+    pub size: Rectangle,
+    pub texture: u32,
 }
 impl Node {
-    fn new(position: Vec2, texture: f32) -> Self {
+    fn new(position: Vec2, texture: u32) -> Self {
         Node {
             position,
-            size: vec2(5.0, 5.0),
+            size: Rectangle::default(),
             texture,
         }
     }

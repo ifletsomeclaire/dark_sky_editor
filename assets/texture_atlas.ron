@@ -1,0 +1,1600 @@
+(
+    textures: [
+        (
+            filepath: "assets\\ship\\aerie.png",
+            rect: (
+                min: (3530, 1810),
+                max: (3670, 2010),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\albatross.png",
+            rect: (
+                min: (200, 0),
+                max: (550, 390),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\arach courier.png",
+            rect: (
+                min: (1870, 3520),
+                max: (1960, 3640),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\arach freighter.png",
+            rect: (
+                min: (3260, 2990),
+                max: (3360, 3280),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\arach hulk.png",
+            rect: (
+                min: (2200, 2660),
+                max: (2390, 3060),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\arach spindle.png",
+            rect: (
+                min: (3420, 3510),
+                max: (3510, 3910),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\arach transport.png",
+            rect: (
+                min: (2400, 3630),
+                max: (2500, 3870),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\archon b-0.png",
+            rect: (
+                min: (200, 2008),
+                max: (510, 2398),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\archon b-1.png",
+            rect: (
+                min: (200, 2788),
+                max: (510, 3178),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\archon c-0.png",
+            rect: (
+                min: (200, 2398),
+                max: (510, 2788),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\archon c-1.png",
+            rect: (
+                min: (200, 1228),
+                max: (510, 1618),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\archon-0.png",
+            rect: (
+                min: (200, 3178),
+                max: (510, 3568),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\archon-1.png",
+            rect: (
+                min: (200, 1618),
+                max: (510, 2008),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\argosy.png",
+            rect: (
+                min: (2680, 3895),
+                max: (2770, 4085),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\arrow.png",
+            rect: (
+                min: (2500, 3630),
+                max: (2560, 3770),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\autumn leaf.png",
+            rect: (
+                min: (2070, 3820),
+                max: (2180, 3980),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\auxiliaryc.png",
+            rect: (
+                min: (1960, 3020),
+                max: (2160, 3420),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\auxiliaryh.png",
+            rect: (
+                min: (2200, 1810),
+                max: (2400, 2210),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\auxiliaryt.png",
+            rect: (
+                min: (1960, 3420),
+                max: (2160, 3820),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\bactrian.png",
+            rect: (
+                min: (1960, 2190),
+                max: (2140, 2660),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\barb.png",
+            rect: (
+                min: (1740, 4020),
+                max: (1800, 4080),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\barbp.png",
+            rect: (
+                min: (3900, 2050),
+                max: (3960, 2110),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\bastion.png",
+            rect: (
+                min: (3190, 1810),
+                max: (3330, 2010),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\behemoth.png",
+            rect: (
+                min: (2780, 2110),
+                max: (3000, 2430),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\berserker.png",
+            rect: (
+                min: (1960, 3990),
+                max: (2060, 4090),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\blackbird.png",
+            rect: (
+                min: (2650, 1950),
+                max: (2810, 2080),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\bounder.png",
+            rect: (
+                min: (2200, 3820),
+                max: (2310, 3990),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\boxwing.png",
+            rect: (
+                min: (3360, 3140),
+                max: (3420, 3210),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\bulk freighter.png",
+            rect: (
+                min: (2200, 3060),
+                max: (2380, 3480),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\carrier.png",
+            rect: (
+                min: (550, 380),
+                max: (820, 780),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\chaser.png",
+            rect: (
+                min: (2700, 3585),
+                max: (2754, 3655),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\clipper.png",
+            rect: (
+                min: (3690, 2980),
+                max: (3790, 3090),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\cloaked.png",
+            rect: (
+                min: (3750, 2100),
+                max: (3751, 2101),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\combat drone.png",
+            rect: (
+                min: (3750, 2040),
+                max: (3790, 2100),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\cool breeze.png",
+            rect: (
+                min: (2500, 3770),
+                max: (2580, 3870),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\corvette.png",
+            rect: (
+                min: (3260, 3280),
+                max: (3380, 3520),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\cruiser.png",
+            rect: (
+                min: (3080, 3455),
+                max: (3260, 3775),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\dagger.png",
+            rect: (
+                min: (2910, 4010),
+                max: (2958, 4082),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\deep river 0.png",
+            rect: (
+                min: (850, 300),
+                max: (1000, 1000),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\deep river 1.png",
+            rect: (
+                min: (1300, 1200),
+                max: (1450, 1900),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\deep river 2.png",
+            rect: (
+                min: (1150, 1600),
+                max: (1300, 2300),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\deep river 3.png",
+            rect: (
+                min: (1000, 600),
+                max: (1150, 1300),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\deep river 4.png",
+            rect: (
+                min: (1300, 1900),
+                max: (1450, 2600),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\deep river.png",
+            rect: (
+                min: (1150, 900),
+                max: (1300, 1600),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\derecho.png",
+            rect: (
+                min: (3540, 2730),
+                max: (3690, 3090),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\dreadnought.png",
+            rect: (
+                min: (2580, 2870),
+                max: (2770, 3245),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\dropship.png",
+            rect: (
+                min: (3260, 4020),
+                max: (3320, 4080),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\earth shaper.png",
+            rect: (
+                min: (3190, 2010),
+                max: (3260, 2090),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\faes\'mar.png",
+            rect: (
+                min: (3630, 2010),
+                max: (3670, 2090),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\falcon.png",
+            rect: (
+                min: (3540, 3090),
+                max: (3700, 3390),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\far lek 14.png",
+            rect: (
+                min: (2810, 1950),
+                max: (2850, 2030),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\far osk 27.png",
+            rect: (
+                min: (2860, 3330),
+                max: (2910, 3430),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\finch.png",
+            rect: (
+                min: (3360, 2990),
+                max: (3420, 3070),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\firebird.png",
+            rect: (
+                min: (3700, 3940),
+                max: (3830, 4090),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\flivver.png",
+            rect: (
+                min: (1820, 4020),
+                max: (1910, 4090),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\flycatcher.png",
+            rect: (
+                min: (2810, 2030),
+                max: (2850, 2110),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\freighter.png",
+            rect: (
+                min: (1740, 3820),
+                max: (1810, 4020),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\frigate.png",
+            rect: (
+                min: (2400, 3190),
+                max: (2524, 3390),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\fury.png",
+            rect: (
+                min: (4010, 1810),
+                max: (4090, 1890),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\gascraft.png",
+            rect: (
+                min: (3014, 4010),
+                max: (3054, 4090),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\gull.png",
+            rect: (
+                min: (2850, 1810),
+                max: (2990, 2010),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\gunboat.png",
+            rect: (
+                min: (3850, 2310),
+                max: (3950, 2430),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\hai aphid.png",
+            rect: (
+                min: (2310, 4010),
+                max: (2390, 4090),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\hai centipede.png",
+            rect: (
+                min: (2910, 3290),
+                max: (3065, 3540),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\hai flea.png",
+            rect: (
+                min: (2958, 4010),
+                max: (3014, 4070),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\hai geocoris.png",
+            rect: (
+                min: (1740, 1500),
+                max: (2050, 1810),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\hai grasshopper.png",
+            rect: (
+                min: (1870, 2800),
+                max: (1960, 2890),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\hai lightning bug.png",
+            rect: (
+                min: (2070, 3980),
+                max: (2190, 4090),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\hai pond strider.png",
+            rect: (
+                min: (2580, 3245),
+                max: (2760, 3425),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\hai shield beetle.png",
+            rect: (
+                min: (3900, 2730),
+                max: (4090, 3000),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\hai solifuge.png",
+            rect: (
+                min: (3420, 2430),
+                max: (3610, 2730),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\hai violin spider.png",
+            rect: (
+                min: (3360, 3070),
+                max: (3420, 3140),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\hai water bug.png",
+            rect: (
+                min: (3850, 3920),
+                max: (4040, 4070),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\hallucination-0.png",
+            rect: (
+                min: (1820, 3760),
+                max: (1940, 3880),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\hallucination-1.png",
+            rect: (
+                min: (1820, 3640),
+                max: (1940, 3760),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\hauler i.png",
+            rect: (
+                min: (3700, 3390),
+                max: (3880, 3640),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\hauler ii.png",
+            rect: (
+                min: (3080, 2430),
+                max: (3260, 2760),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\hauler iii.png",
+            rect: (
+                min: (2400, 2110),
+                max: (2580, 2510),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\hawk.png",
+            rect: (
+                min: (3530, 2010),
+                max: (3630, 2100),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\headhunter.png",
+            rect: (
+                min: (3750, 2310),
+                max: (3850, 2430),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\heavy shuttle.png",
+            rect: (
+                min: (3370, 3780),
+                max: (3420, 3860),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\heliarch interdictor.png",
+            rect: (
+                min: (3420, 3180),
+                max: (3530, 3510),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\heliarch neutralizer.png",
+            rect: (
+                min: (3420, 3910),
+                max: (3540, 4080),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\heliarch punisher.png",
+            rect: (
+                min: (550, 0),
+                max: (850, 380),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\hurricane.png",
+            rect: (
+                min: (550, 780),
+                max: (830, 1160),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\ibis.png",
+            rect: (
+                min: (3700, 3640),
+                max: (3850, 3940),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\kar ik vot 349.png",
+            rect: (
+                min: (200, 3568),
+                max: (440, 4048),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\kestrel.png",
+            rect: (
+                min: (1960, 2660),
+                max: (2190, 3020),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\kimek briar.png",
+            rect: (
+                min: (1740, 3640),
+                max: (1820, 3820),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\kimek spire.png",
+            rect: (
+                min: (2200, 2210),
+                max: (2370, 2660),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\kimek thistle.png",
+            rect: (
+                min: (3950, 2430),
+                max: (4070, 2680),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\kimek thorn.png",
+            rect: (
+                min: (1870, 2680),
+                max: (1950, 2770),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\lampyrid.png",
+            rect: (
+                min: (2910, 3040),
+                max: (3070, 3290),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\lance.png",
+            rect: (
+                min: (3360, 3210),
+                max: (3412, 3280),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\leviathan.png",
+            rect: (
+                min: (3610, 2430),
+                max: (3780, 2690),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\localworldship.png",
+            rect: (
+                min: (200, 770),
+                max: (475, 1228),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\maeri\'het-00.png",
+            rect: (
+                min: (1740, 2400),
+                max: (1840, 2560),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\maeri\'het-01.png",
+            rect: (
+                min: (1840, 2400),
+                max: (1940, 2560),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\maeri\'het-02.png",
+            rect: (
+                min: (1840, 2240),
+                max: (1940, 2400),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\maeri\'het-03.png",
+            rect: (
+                min: (1740, 2240),
+                max: (1840, 2400),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\manta.png",
+            rect: (
+                min: (2400, 2510),
+                max: (2550, 2680),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\marrowe.png",
+            rect: (
+                min: (2310, 3480),
+                max: (2370, 3620),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\marrows.png",
+            rect: (
+                min: (3470, 1950),
+                max: (3530, 2090),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\marroww.png",
+            rect: (
+                min: (2500, 3390),
+                max: (2560, 3530),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mboundere.png",
+            rect: (
+                min: (2200, 3650),
+                max: (2310, 3820),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mbounders.png",
+            rect: (
+                min: (2200, 3480),
+                max: (2310, 3650),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mbounderw.png",
+            rect: (
+                min: (1960, 3820),
+                max: (2070, 3990),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\met par tek 53.png",
+            rect: (
+                min: (2910, 3540),
+                max: (3050, 3810),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mfalcone.png",
+            rect: (
+                min: (3540, 3390),
+                max: (3700, 3690),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mfalcons.png",
+            rect: (
+                min: (3700, 3090),
+                max: (3860, 3390),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mfalconw.png",
+            rect: (
+                min: (3540, 3690),
+                max: (3700, 3990),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mfirebirde.png",
+            rect: (
+                min: (2780, 3910),
+                max: (2910, 4070),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mfirebirds.png",
+            rect: (
+                min: (2780, 3170),
+                max: (2910, 3330),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mfirebirdw.png",
+            rect: (
+                min: (2780, 3590),
+                max: (2910, 3750),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mfury.png",
+            rect: (
+                min: (2200, 3990),
+                max: (2300, 4090),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mleviathane.png",
+            rect: (
+                min: (2910, 2780),
+                max: (3080, 3040),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mleviathans.png",
+            rect: (
+                min: (3080, 3775),
+                max: (3250, 4035),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mleviathanw.png",
+            rect: (
+                min: (3780, 2430),
+                max: (3950, 2690),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mmantae.png",
+            rect: (
+                min: (2400, 3020),
+                max: (2550, 3190),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mmantas.png",
+            rect: (
+                min: (2400, 2850),
+                max: (2550, 3020),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mmantaw.png",
+            rect: (
+                min: (2400, 2680),
+                max: (2550, 2850),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\model 128.png",
+            rect: (
+                min: (3260, 2430),
+                max: (3420, 2790),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\model 16.png",
+            rect: (
+                min: (2510, 3870),
+                max: (2580, 4070),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\model 256.png",
+            rect: (
+                min: (1960, 1810),
+                max: (2200, 2190),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\model 32.png",
+            rect: (
+                min: (2780, 3330),
+                max: (2860, 3590),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\model 512.png",
+            rect: (
+                min: (200, 390),
+                max: (540, 770),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\model 64.png",
+            rect: (
+                min: (2580, 3695),
+                max: (2680, 4015),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\model 8.png",
+            rect: (
+                min: (2500, 3530),
+                max: (2580, 3630),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\modified argosy.png",
+            rect: (
+                min: (2310, 3820),
+                max: (2400, 4010),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mosprey.png",
+            rect: (
+                min: (3210, 2110),
+                max: (3400, 2330),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mquicksilvere.png",
+            rect: (
+                min: (1870, 2920),
+                max: (1950, 3030),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mquicksilvers.png",
+            rect: (
+                min: (1870, 3040),
+                max: (1950, 3150),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mquicksilverw.png",
+            rect: (
+                min: (1870, 3280),
+                max: (1950, 3390),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mravene.png",
+            rect: (
+                min: (2990, 1810),
+                max: (3190, 1950),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mravens.png",
+            rect: (
+                min: (3330, 1810),
+                max: (3530, 1950),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mravenw.png",
+            rect: (
+                min: (2990, 1950),
+                max: (3190, 2090),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\msplintere.png",
+            rect: (
+                min: (3260, 3780),
+                max: (3370, 4020),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\msplinters.png",
+            rect: (
+                min: (3900, 1810),
+                max: (4010, 2050),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\msplinterw.png",
+            rect: (
+                min: (2780, 2930),
+                max: (2890, 3170),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\mule.png",
+            rect: (
+                min: (3260, 3520),
+                max: (3370, 3780),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\nest.png",
+            rect: (
+                min: (3880, 3390),
+                max: (4060, 3640),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\osprey.png",
+            rect: (
+                min: (3400, 2110),
+                max: (3590, 2330),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\pelican.png",
+            rect: (
+                min: (2400, 1810),
+                max: (2650, 2110),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\penguin\\penguin-00.png",
+            rect: (
+                min: (3370, 3600),
+                max: (3420, 3680),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\penguin\\penguin-01.png",
+            rect: (
+                min: (2700, 3425),
+                max: (2750, 3505),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\penguin\\penguin-02.png",
+            rect: (
+                min: (2524, 3190),
+                max: (2574, 3270),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\penguin\\penguin-03.png",
+            rect: (
+                min: (3370, 3860),
+                max: (3420, 3940),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\penguin\\penguin-04.png",
+            rect: (
+                min: (2580, 4015),
+                max: (2630, 4095),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\penguin\\penguin-05.png",
+            rect: (
+                min: (3370, 3680),
+                max: (3420, 3760),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\penguin\\penguin-06.png",
+            rect: (
+                min: (4040, 4000),
+                max: (4090, 4080),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\penguin\\penguin-07.png",
+            rect: (
+                min: (4040, 3920),
+                max: (4090, 4000),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\penguin\\penguin-08.png",
+            rect: (
+                min: (2524, 3270),
+                max: (2574, 3350),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\penguin\\penguin-09.png",
+            rect: (
+                min: (2630, 4015),
+                max: (2680, 4095),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\penguin\\penguin-10.png",
+            rect: (
+                min: (3370, 3940),
+                max: (3420, 4020),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\penguin\\penguin-11.png",
+            rect: (
+                min: (2860, 3510),
+                max: (2910, 3590),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\penguin\\penguin-12.png",
+            rect: (
+                min: (2860, 3430),
+                max: (2910, 3510),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\penguin\\penguin-13.png",
+            rect: (
+                min: (2700, 3505),
+                max: (2750, 3585),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\penguin\\penguin-14.png",
+            rect: (
+                min: (3370, 3520),
+                max: (3420, 3600),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\petrel.png",
+            rect: (
+                min: (2850, 2010),
+                max: (2910, 2100),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\pointedstick_vanguard.png",
+            rect: (
+                min: (2580, 3425),
+                max: (2700, 3695),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\protector.png",
+            rect: (
+                min: (3690, 2730),
+                max: (3900, 2980),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\puffin.png",
+            rect: (
+                min: (1920, 3880),
+                max: (1960, 3960),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\pug arfecta.png",
+            rect: (
+                min: (1450, 1500),
+                max: (1740, 1850),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\pug enfolta.png",
+            rect: (
+                min: (3670, 1810),
+                max: (3790, 2040),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\pug maboro.png",
+            rect: (
+                min: (2580, 2110),
+                max: (2780, 2470),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\pug zibruka.png",
+            rect: (
+                min: (1820, 3880),
+                max: (1920, 4020),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\quicksilver.png",
+            rect: (
+                min: (1870, 3160),
+                max: (1950, 3270),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\raider.png",
+            rect: (
+                min: (3000, 2110),
+                max: (3210, 2420),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\rainmaker.png",
+            rect: (
+                min: (3790, 2980),
+                max: (3892, 3080),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\raven.png",
+            rect: (
+                min: (2650, 1810),
+                max: (2850, 1950),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\riptide.png",
+            rect: (
+                min: (2910, 2430),
+                max: (3080, 2780),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\roost.png",
+            rect: (
+                min: (3080, 3130),
+                max: (3260, 3455),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\saryd runabout.png",
+            rect: (
+                min: (1870, 3400),
+                max: (1960, 3510),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\saryd sojourner.png",
+            rect: (
+                min: (3080, 2760),
+                max: (3240, 3130),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\saryd traveler.png",
+            rect: (
+                min: (2910, 3810),
+                max: (3080, 4010),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\saryd visitor.png",
+            rect: (
+                min: (2780, 3750),
+                max: (2910, 3910),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\science drone.png",
+            rect: (
+                min: (1870, 2560),
+                max: (1950, 2640),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\scout.png",
+            rect: (
+                min: (2910, 2010),
+                max: (2970, 2100),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\selii\'mar.png",
+            rect: (
+                min: (3670, 2040),
+                max: (3710, 2110),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\shuttle=0.png",
+            rect: (
+                min: (3320, 4020),
+                max: (3370, 4090),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\shuttle=1.png",
+            rect: (
+                min: (3370, 4020),
+                max: (3420, 4090),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\shuttle=2.png",
+            rect: (
+                min: (1910, 4020),
+                max: (1960, 4090),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\skein.png",
+            rect: (
+                min: (2580, 2470),
+                max: (2760, 2870),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\skylark.png",
+            rect: (
+                min: (3590, 2110),
+                max: (3750, 2370),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\sparrow.png",
+            rect: (
+                min: (3260, 2010),
+                max: (3330, 2090),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\splinter.png",
+            rect: (
+                min: (3790, 1810),
+                max: (3900, 2050),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\star barge.png",
+            rect: (
+                min: (4010, 1976),
+                max: (4080, 2056),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\star queen.png",
+            rect: (
+                min: (2400, 3390),
+                max: (2500, 3630),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\starling.png",
+            rect: (
+                min: (2680, 3695),
+                max: (2780, 3895),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\strong wind.png",
+            rect: (
+                min: (3850, 3640),
+                max: (4010, 3920),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\subsidurial.png",
+            rect: (
+                min: (3750, 2110),
+                max: (3950, 2310),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\summer leaf.png",
+            rect: (
+                min: (2310, 3650),
+                max: (2390, 3790),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\surveillance drone.png",
+            rect: (
+                min: (3710, 2040),
+                max: (3750, 2100),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\tek far 109.png",
+            rect: (
+                min: (1740, 1810),
+                max: (1960, 2240),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\tek far 71 lek.png",
+            rect: (
+                min: (3420, 2730),
+                max: (3540, 3180),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\tek far 78 osk.png",
+            rect: (
+                min: (2780, 2430),
+                max: (2910, 2930),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\telis\'het.png",
+            rect: (
+                min: (3260, 2790),
+                max: (3410, 2990),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\tempest.png",
+            rect: (
+                min: (3860, 3090),
+                max: (4030, 3360),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\tern.png",
+            rect: (
+                min: (1920, 3960),
+                max: (1960, 4020),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\vanguard.png",
+            rect: (
+                min: (3950, 2110),
+                max: (4063, 2377),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite adult-00.png",
+            rect: (
+                min: (1150, 600),
+                max: (1500, 900),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite adult-01.png",
+            rect: (
+                min: (1550, 0),
+                max: (1900, 300),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite adult-02.png",
+            rect: (
+                min: (1000, 300),
+                max: (1350, 600),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite adult-03.png",
+            rect: (
+                min: (2550, 600),
+                max: (2900, 900),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite adult-04.png",
+            rect: (
+                min: (1500, 600),
+                max: (1850, 900),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite adult-05.png",
+            rect: (
+                min: (850, 0),
+                max: (1200, 300),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite adult-06.png",
+            rect: (
+                min: (1450, 1200),
+                max: (1800, 1500),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite adult-07.png",
+            rect: (
+                min: (2900, 600),
+                max: (3250, 900),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite adult-08.png",
+            rect: (
+                min: (2200, 600),
+                max: (2550, 900),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite adult-09.png",
+            rect: (
+                min: (1300, 900),
+                max: (1650, 1200),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite adult-10.png",
+            rect: (
+                min: (1650, 900),
+                max: (2000, 1200),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite adult-11.png",
+            rect: (
+                min: (1200, 0),
+                max: (1550, 300),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite adult-12.png",
+            rect: (
+                min: (1850, 600),
+                max: (2200, 900),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite infant-0.png",
+            rect: (
+                min: (1740, 2800),
+                max: (1870, 2920),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite infant-1.png",
+            rect: (
+                min: (1740, 2680),
+                max: (1870, 2800),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite infant-2.png",
+            rect: (
+                min: (1740, 2920),
+                max: (1870, 3040),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite infant-3.png",
+            rect: (
+                min: (1740, 2560),
+                max: (1870, 2680),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite infant-4.png",
+            rect: (
+                min: (1740, 3280),
+                max: (1870, 3400),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite infant-5.png",
+            rect: (
+                min: (1740, 3040),
+                max: (1870, 3160),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite infant-6.png",
+            rect: (
+                min: (1740, 3160),
+                max: (1870, 3280),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite infant-7.png",
+            rect: (
+                min: (1740, 3520),
+                max: (1870, 3640),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\void sprite infant-8.png",
+            rect: (
+                min: (1740, 3400),
+                max: (1870, 3520),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\wardragon.png",
+            rect: (
+                min: (3330, 1950),
+                max: (3470, 2100),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\wasp.png",
+            rect: (
+                min: (4010, 1890),
+                max: (4080, 1976),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\winter gale.png",
+            rect: (
+                min: (2400, 3870),
+                max: (2510, 4070),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\world-ship a.png",
+            rect: (
+                min: (0, 690),
+                max: (200, 1380),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\world-ship b.png",
+            rect: (
+                min: (0, 1380),
+                max: (200, 2070),
+            ),
+        ),
+        (
+            filepath: "assets\\ship\\world-ship c.png",
+            rect: (
+                min: (0, 0),
+                max: (200, 690),
+            ),
+        ),
+    ],
+)

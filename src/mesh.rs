@@ -1,6 +1,6 @@
 use bevy::{
-    prelude::Mesh, render::mesh::Vertex, render::mesh::VertexAttribute,
-    render::mesh::VertexAttributeValues, render::pipeline::PrimitiveTopology,
+    prelude::Mesh, render::mesh::VertexAttribute,
+    render::pipeline::PrimitiveTopology,
 };
 
 pub struct MeshMaker {
@@ -31,10 +31,10 @@ impl MeshMaker {
             .push(VertexAttribute::normal(self.vert_norm.clone()));
         mesh.attributes
             .push(VertexAttribute::uv(self.vert_uvs.clone()));
-        mesh.attributes
-            .push(VertexAttribute::color(self.vert_colors.clone()));
-        mesh.attributes
-            .push(VertexAttribute::texture(self.vert_textures.clone()));
+        // mesh.attributes
+        //     .push(VertexAttribute::color(self.vert_colors.clone()));
+        // mesh.attributes
+        //     .push(VertexAttribute::texture(self.vert_textures.clone()));
         mesh
     }
 }
@@ -49,7 +49,7 @@ pub trait EditableMesh {
     fn get_mut_vertex_positions(&mut self) -> Option<&mut Vec<[f32; 3]>>;
     fn get_mut_vertex_normals(&mut self) -> Option<&mut Vec<[f32; 3]>>;
     fn get_mut_vertex_uvs(&mut self) -> Option<&mut Vec<[f32; 2]>>;
-    fn add_mesh(&mut self, other: &Mesh) {}
+    fn add_mesh(&mut self, _other: &Mesh) {}
 }
 
 impl EditableMesh for Mesh {
