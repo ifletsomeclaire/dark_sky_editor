@@ -73,14 +73,7 @@ pub fn load_atlas(
 
         let texas = textures.get(&texture_atlas_texture).unwrap();
         let texatlas = texture_atlases.get(&atlas_handle).unwrap();
-        let fout = &mut File::create(&Path::new(&format!("texture_atlas.png"))).unwrap();
-        let encoder = image::png::PngEncoder::new(fout);
-        let _ok = encoder.encode(
-            &texas.data,
-            texas.size.x() as u32,
-            texas.size.y() as u32,
-            image::ColorType::Rgba8,
-        );
+        print_texture_to_file(texas, "texture_atlas.png");
 
         let mut atlas_infos = AtlasInfo::new();
         let rects = &texatlas.textures;
@@ -108,11 +101,16 @@ pub fn load_atlas(
     }
 }
 
-// #[derive(Debug)]
-// struct ExportAtlasInfo {
-//     filepath: String,
-//     rect: bevy::sprite::Rect,
-// }
+fn print_texture_to_file(texture: &Texture, path: &str) {
+    let fout = &mut File::create(&Path::new(path)).unwrap();
+    let encoder = image::png::PngEncoder::new(fout);
+    let _ok = encoder.encode(
+        &texture.data,
+        texture.size.x() as u32,
+        texture.size.y() as u32,
+        image::ColorType::Rgba8,
+    );
+}
 
 // import from Ron
 #[derive(Debug, Deserialize, Serialize)]
