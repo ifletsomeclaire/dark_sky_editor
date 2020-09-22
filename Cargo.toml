@@ -15,3 +15,4 @@ walkdir = "2"
 serde = { version = "1.0.60", features = ["serde_derive"] }
 ron = "*"
 rand = "*"
+dds-rs = "0.7.0"

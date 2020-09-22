@@ -24,6 +24,7 @@ use texture_atlas::{load_atlas, ta_setup, AtlasInfo, AtlasSpriteHandles};
 
 // mod bevy_lyon;
 mod camera;
+mod dds_import;
 mod material;
 mod mesh;
 mod node_graph;
@@ -48,7 +49,7 @@ fn main() {
         // .add_startup_system(ta_setup.system())
         // .add_system(load_atlas.system())
         .add_system(camera_movement.system())
-        .add_system(move_ship.system())
+        // .add_system(move_ship.system())
         .add_system_to_stage(
             stage::POST_UPDATE,
             asset_shader_defs_system::<MeshMaterial>.system(),
@@ -68,7 +69,7 @@ fn setup(
     mut shaders: ResMut<Assets<Shader>>,
     mut render_graph: ResMut<RenderGraph>,
     mut materials: ResMut<Assets<MeshMaterial>>,
-    // mut textures: ResMut<Assets<Texture>>,
+    mut textures: ResMut<Assets<Texture>>,
     mut meshes: ResMut<Assets<Mesh>>,
 ) {
     let pipeline_handle = pipelines.add(PipelineDescriptor::default_config(ShaderStages {
@@ -122,8 +123,31 @@ fn setup(
         })
         .with(CameraMarker);
 
+    let mut texture_handles = Vec::new();
+    for h in dds_import::dds_to_texture("assets/texture_atlas.dds") {
+        texture_handles.push(textures.add(h))
+    }
+    println!("{:?}", texture_handles);
+
+    for h in texture_handles {
+        commands
+            .spawn(MeshComponents {
+                mesh: meshes.add(Mesh::from(shape::Quad {
+                    size: vec2(100., 100.),
+                    flip: false,
+                })),
+                render_pipelines: specialized_pipeline.clone(),
+                ..Default::default()
+            })
+            .with(materials.add(MeshMaterial {
+                basecolor: Color::from(vec4(1.0, 1.0, 1.0, 1.0)),
+                texture1: Some(h),
+                shaded: false,
+            }));
+    }
+
     let atlas_handle = asset_server.load("assets/texture_atlas.png").unwrap();
-    // let fly_handle = asset_server.load("assets/flycatcher.png").unwrap();
+    // let fly_handle = asset_server.load("assets/ship/model 512.png").unwrap();
     // let quail_handle = asset_server.load("assets/quail-color.png").unwrap();
 
     // NOT ACTUALLY AVAILABLE BECAUSE IT'S NOT LOADED YET
@@ -136,6 +160,7 @@ fn setup(
     let material = materials.add(MeshMaterial {
         basecolor: Color::from(vec4(1.0, 1.0, 1.0, 1.0)),
         texture1: Some(atlas_handle),
+        // texture1: Some(texture_handles[0]),
         // texture2: None,
         shaded: false,
     });
@@ -150,6 +175,10 @@ fn setup(
 
         for node in &graph.nodes {
             let rect = atlas_info.textures[node.texture as usize].rect;
+            // let quad = Mesh::from(shape::Quad {
+            //     size: vec2(340., 380.),
+            //     flip: false,
+            // });
             let quad = Mesh::from(shape::Quad {
                 size: vec2(rect.max[0] - rect.min[0], rect.max[1] - rect.min[1]),
                 flip: false,

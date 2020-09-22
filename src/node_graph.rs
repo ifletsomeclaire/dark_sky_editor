@@ -28,8 +28,8 @@ impl Graph {
                 if map.get_value((w + width) as usize, (h + height) as usize) > 0.0 {
                     nodes.push(Node::new(
                         vec2((w * 500) as f32, (h * 500) as f32),
-                        rng.gen_range(0, 228),
-                        // 1,
+                        // rng.gen_range(0, 228),
+                        125,
                     ));
                 }
             }
