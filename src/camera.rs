@@ -1,6 +1,6 @@
-use bevy::{input::mouse::MouseMotion, input::mouse::MouseWheel, math::vec3, prelude::*};
+use bevy::{input::mouse::MouseMotion, input::mouse::MouseWheel, math::vec3, prelude::*, render::camera::OrthographicProjection};
 
-use crate::{Handles, material::GlobalMaterial, material::MeshMaterial};
+use crate::{material::GlobalMaterial, material::MeshMaterial, Handles};
 
 #[derive(Default)]
 pub struct MouseState {
@@ -38,14 +38,15 @@ pub fn camera_movement(
             for event in state.mouse_motion_event_reader.iter(&mouse_move) {
                 for (_, mut trans) in &mut query.iter() {
                     let rot = trans.rotation();
-                    trans.translate(rot.mul_vec3(vec3(0.0, 0.0, -event.delta[1])));
+                    trans.translate(rot.mul_vec3(vec3(0.0, 0.0, -event.delta[1] * 3.)));
                 }
+               
             }
         }
         for event in state.mouse_wheel_event_reader.iter(&mouse_wheel_events) {
             for (_, mut trans) in &mut query.iter() {
                 let rot = trans.rotation();
-                trans.translate(rot.mul_vec3(vec3(0.0, 0.0, -event.y * 10.)))
+                trans.translate(rot.mul_vec3(vec3(0.0, 0.0, -event.y * 100.)))
             }
         }
     }
@@ -61,7 +62,7 @@ pub fn update_camera_distance(
         for (_, transform) in &mut query.iter() {
             // g_mat.distance = transform.translation().z();
             m_mat.distance = transform.translation().z();
-            println!("distance: {}", m_mat.distance);
+            // println!("distance: {}", m_mat.distance);
         }
     }
 }

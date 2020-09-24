@@ -3,6 +3,7 @@ use bevy::{
     math::vec2,
     math::vec4,
     prelude::*,
+    render::camera::OrthographicProjection,
     render::camera::PerspectiveProjection,
     render::pipeline::DynamicBinding,
     render::pipeline::PipelineDescriptor,
@@ -16,13 +17,15 @@ use bevy::{
 };
 
 use camera::{camera_movement, update_camera_distance, CameraMarker, MouseState};
-use material::{GlobalMaterial, MeshMaterial};
+use material::{GlobalMaterial, MeshMaterial, SkyboxMaterial};
 use mesh::{EditableMesh, MeshMaker};
 use node_graph::{Graph, Ship};
+use shapes::Skybox;
 use texture_atlas::{load_atlas, ta_setup, AtlasInfo, AtlasSpriteHandles};
 
 // mod bevy_lyon;
 mod camera;
+mod shapes;
 mod dds_import;
 mod material;
 mod mesh;
@@ -42,17 +45,21 @@ fn main() {
         .add_default_plugins()
         .init_resource::<MouseState>()
         .init_resource::<Handles>()
+        .init_resource::<MeshHandles>()
         // .init_resource::<AtlasSpriteHandles>()
         .add_asset::<MeshMaterial>()
+        .add_asset::<SkyboxMaterial>()
         .add_asset::<GlobalMaterial>()
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(PrintDiagnosticsPlugin::default())
         .add_startup_system(setup.system())
+        // .add_startup_system(background.system())
         // .add_startup_system(ta_setup.system())
         // .add_system(load_atlas.system())
         .add_system(camera_movement.system())
         .add_system(update_camera_distance.system())
         .add_system(move_ship.system())
+        // .add_system(aspect_ratio.system())
         .add_system_to_stage(
             stage::POST_UPDATE,
             bevy::render::shader::asset_shader_defs_system::<MeshMaterial>.system(),
@@ -72,6 +79,7 @@ fn setup(
     mut shaders: ResMut<Assets<Shader>>,
     mut render_graph: ResMut<RenderGraph>,
     mut materials: ResMut<Assets<MeshMaterial>>,
+    mut skymaterials: ResMut<Assets<SkyboxMaterial>>,
     mut globalmat: ResMut<Assets<GlobalMaterial>>,
     mut textures: ResMut<Assets<Texture>>,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -118,18 +126,77 @@ fn setup(
             ..Default::default()
         },
     )]);
+    let skybox_pipeline_handle = pipelines.add(PipelineDescriptor::default_config(ShaderStages {
+        vertex: shaders.add(Shader::from_glsl(
+            ShaderStage::Vertex,
+            include_str!("../shaders/vert_shader.vert"),
+        )),
+        fragment: Some(shaders.add(Shader::from_glsl(
+            ShaderStage::Fragment,
+            include_str!("../shaders/frag_shader.frag"),
+        ))),
+    }));
+    render_graph.add_system_node(
+        "skybox_material",
+        AssetRenderResourcesNode::<SkyboxMaterial>::new(true),
+    );
+    render_graph
+        .add_node_edge("skybox_material", base::node::MAIN_PASS)
+        .unwrap();
+    let sky_specialized_pipeline = RenderPipelines::from_pipelines(vec![RenderPipeline::specialized(
+        skybox_pipeline_handle,
+        PipelineSpecialization {
+            dynamic_bindings: vec![
+                // Transform
+                DynamicBinding {
+                    bind_group: 2,
+                    binding: 0,
+                },
+                // SkyboxMaterial_basecolor
+                DynamicBinding {
+                    bind_group: 3,
+                    binding: 0,
+                },
+            ],
+            ..Default::default()
+        },
+    )]);
+    let mut skybox = Mesh::from(shapes::Skybox {size: 100000.});
+    let quad_handle = meshes.add(skybox);
+    let sky_material_handle = skymaterials.add(SkyboxMaterial {
+        basecolor: Color::rgba(0.0, 0.0, 0.0, 1.0),
+    });
+    // backgroundhandle.background = Some(quad_handle);
+    commands
+        // textured quad - normal
+        .spawn(MeshComponents {
+            mesh: quad_handle,
+            draw: Draw {
+                is_transparent: true,
+                ..Default::default()
+            },
+            render_pipelines: sky_specialized_pipeline,
+            ..Default::default()
+        }).with(sky_material_handle);
+
 
     commands
         .spawn(Camera3dComponents {
+            // global_transform
             transform: Transform::new(Mat4::face_toward(
-                Vec3::new(0.0, -0.01, 2000.0),
+                Vec3::new(0.0, -0.01, 5000.0),
                 Vec3::new(0.0, 0.0, 0.0),
                 Vec3::new(0.0, 0.0, 1.0),
             )),
             perspective_projection: PerspectiveProjection {
-                far: 200000.,
+                far: f32::MAX,
                 ..Default::default()
             },
+            // perspective_projection: PerspectiveProjection {
+            //     far: 200000.,
+
+            //     ..Default::default()
+            // },
             ..Default::default()
         })
         .with(CameraMarker);
@@ -138,7 +205,7 @@ fn setup(
     for h in dds_import::dds_to_texture("assets/texture_atlas.dds") {
         texture_handles.push(textures.add(h))
     }
-    println!("{:?}", texture_handles);
+    // println!("{:?}", texture_handles);
 
     // for h in texture_handles {
     // commands
@@ -182,7 +249,7 @@ fn setup(
 
     let mut z_value: f32 = 0.0;
     for seed in 1..2 {
-        let graph = Graph::new(10, 10, 10, seed);
+        let graph = Graph::new(10, 15, 15, seed);
         println!("nodes: {}", graph.nodes.len());
         let mut meshmakers = Vec::new();
         let mut m_maker = MeshMaker::new();
@@ -210,27 +277,20 @@ fn setup(
             }
             // uvs
             for uv in quad.get_vertex_uvs().unwrap() {
-                let x = if uv[0] < 0.01 {
-                    rect.min[0] / atlas_size[0]
-                } else {
-                    rect.max[0] / atlas_size[0]
-                };
-                let y = if uv[1] < 0.01 {
-                    rect.min[1] / atlas_size[1]
-                } else {
-                    rect.max[1] / atlas_size[1]
-                };
-                m_maker.vert_uvs.push([x, y]);
+                m_maker.vert_uvs.push([
+                    match uv[0] {
+                        x if x < 0.0001 => rect.min[0] / atlas_size[0],
+                        _ => rect.max[0] / atlas_size[0],
+                    },
+                    match uv[1] {
+                        y if y < 0.0001 => rect.min[1] / atlas_size[1],
+                        _ => rect.max[1] / atlas_size[1],
+                    },
+                ]);
+
                 // m_maker.vert_uvs.push(uv);
             }
-            // colors
-            for color in quad.get_vertex_colors().unwrap() {
-                m_maker.vert_colors.push(color);
-            }
-            // texture index
-            for _ in quad.get_vertex_textures().unwrap() {
-                m_maker.vert_textures.push(1.0);
-            }
+
             for ind in quad.indices.unwrap() {
                 m_maker.indices.push(ind + count as u32);
             }
@@ -267,6 +327,63 @@ fn setup(
                 .with(material);
         }
     }
+}
+#[derive(Default)]
+struct MeshHandles {
+    background: Option<Handle<Mesh>>,
+}
+
+fn aspect_ratio(mut meshes: ResMut<Assets<Mesh>>, handle: Res<MeshHandles>, windows: Res<Windows>) {
+    if let Some(h) = &handle.background {
+        if let Some(mesh) = meshes.get_mut(&h) {
+            let Window { width, height, .. } = windows.get_primary().expect("No primary window");
+            let width = *width as f32 * 3_f32;
+            let height = *height as f32 * 3_f32;
+            let left = -width;
+            let right = width;
+            let bottom = -height;
+            let top = height;
+            match mesh.attributes[0].values {
+                bevy::render::mesh::VertexAttributeValues::Float3(ref mut vertices) => {
+                    vertices[2] = [left, top, 0.0];
+                    vertices[3] = [right, top, 0.0];
+                    vertices[1] = [left, bottom, 0.0];
+                    vertices[0] = [right, bottom, 0.0];
+                }
+                _ => (),
+            }
+        }
+    }
+}
+
+fn background(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut backgroundhandle: ResMut<MeshHandles>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut textures: ResMut<Assets<Texture>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    let mut mesh = Mesh::from(shapes::Skybox {size: 10000000.});
+    let quad_handle = meshes.add(mesh);
+    let red_material_handle = materials.add(StandardMaterial {
+        albedo: Color::rgba(0.0, 0.0, 0.0, 1.0),
+        // albedo_texture: Some(texture_handle),
+        shaded: false,
+        ..Default::default()
+    });
+    backgroundhandle.background = Some(quad_handle);
+    commands
+        // textured quad - normal
+        .spawn(PbrComponents {
+            mesh: quad_handle,
+            material: red_material_handle,
+            draw: Draw {
+                is_transparent: true,
+                ..Default::default()
+            },
+            ..Default::default()
+        });
 }
 
 fn move_ship(mut meshes: ResMut<Assets<Mesh>>, handles: Res<Handles>, mut query: Query<&Ship>) {

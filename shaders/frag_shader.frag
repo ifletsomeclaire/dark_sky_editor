@@ -1,5 +1,7 @@
 #version 450
 
+in float gl_FragCoord;
+
 const int MAX_LIGHTS = 10;
 
 struct Light {
@@ -23,7 +25,7 @@ layout(set = 1, binding = 0) uniform Lights {
     Light SceneLights[MAX_LIGHTS];
 };
 
-layout(set = 3, binding = 0) uniform MeshMaterial_basecolor {
+layout(set = 3, binding = 0) uniform SkyboxMaterial_basecolor {
     vec4 basecolor;
 };
 
@@ -44,5 +46,9 @@ void main() {
     }
     output_color.xyz *= color;
     
+    if (gl_FragCoord[0] / 10.0) < 1.0) {
+        o_Target = vec4(1.0, 1.0, 1.0, 1.0);
+    } else {
     o_Target = output_color;
+    }
 }

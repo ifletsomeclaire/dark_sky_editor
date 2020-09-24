@@ -28,3 +28,8 @@ pub const GLOBALMATERIAL: u128 = 468344185765435115;
 pub struct GlobalMaterial {
     pub distance: f32,
 }
+
+#[derive(RenderResources, ShaderDefs)]
+pub struct SkyboxMaterial {
+    pub basecolor: Color,
+}
