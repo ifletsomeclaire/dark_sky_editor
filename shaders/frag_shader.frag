@@ -1,6 +1,6 @@
 #version 450
 
-in float gl_FragCoord;
+in vec4 gl_FragCoord;
 
 const int MAX_LIGHTS = 10;
 
@@ -29,24 +29,40 @@ layout(set = 3, binding = 0) uniform SkyboxMaterial_basecolor {
     vec4 basecolor;
 };
 
+# ifdef SKYBOXMATERIAL_TEXTURE
+layout(set = 3, binding = 1) uniform texture2D SkyboxMaterial_texture;
+layout(set = 3, binding = 2) uniform sampler SkyboxMaterial_texture_sampler;
+# endif
+
 
 void main() {
     vec4 output_color = basecolor;
 
-    vec3 normal = normalize(v_Normal);
-    vec3 ambient = vec3(0.05, 0.05, 0.05);
-    vec3 color = ambient;
-    for (int i=0; i<int(NumLights.x) && i<MAX_LIGHTS; ++i) {
-        Light light = SceneLights[i];
-        // compute Lambertian diffuse term
-        vec3 light_dir = normalize(light.pos.xyz - v_Position);
-        float diffuse = max(0.0, dot(normal, light_dir));
-        // add light contribution
-        color += diffuse * light.color.xyz;
-    }
-    output_color.xyz *= color;
+
+    // vec3 normal = normalize(v_Normal);
+    // vec3 ambient = vec3(0.05, 0.05, 0.05);
+    // vec3 color = ambient;
+    // for (int i=0; i<int(NumLights.x) && i<MAX_LIGHTS; ++i) {
+    //     Light light = SceneLights[i];
+    //     // compute Lambertian diffuse term
+    //     vec3 light_dir = normalize(light.pos.xyz - v_Position);
+    //     float diffuse = max(0.0, dot(normal, light_dir));
+    //     // add light contribution
+    //     color += diffuse * light.color.xyz;
+    // }
+    // output_color.xyz *= color;
     
-    if (gl_FragCoord[0] / 10.0) < 1.0) {
+    # ifdef SKYBOXMATERIAL_TEXTURE
+        output_color *= texture(
+            sampler2D(SkyboxMaterial_texture, SkyboxMaterial_texture_sampler),
+            v_Uv);
+    # endif
+
+    output_color.y = output_color.x;
+    output_color.z = output_color.x;
+    output_color.a = output_color.x;
+
+    if (output_color[0] > 0.49) {
         o_Target = vec4(1.0, 1.0, 1.0, 1.0);
     } else {
     o_Target = output_color;

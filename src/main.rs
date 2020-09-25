@@ -20,6 +20,7 @@ use camera::{camera_movement, update_camera_distance, CameraMarker, MouseState};
 use material::{GlobalMaterial, MeshMaterial, SkyboxMaterial};
 use mesh::{EditableMesh, MeshMaker};
 use node_graph::{Graph, Ship};
+use shape::Quad;
 use shapes::Skybox;
 use texture_atlas::{load_atlas, ta_setup, AtlasInfo, AtlasSpriteHandles};
 
@@ -63,6 +64,10 @@ fn main() {
         .add_system_to_stage(
             stage::POST_UPDATE,
             bevy::render::shader::asset_shader_defs_system::<MeshMaterial>.system(),
+        )
+        .add_system_to_stage(
+            stage::POST_UPDATE,
+            bevy::render::shader::asset_shader_defs_system::<SkyboxMaterial>.system(),
         )
         .run();
 }
@@ -161,10 +166,15 @@ fn setup(
             ..Default::default()
         },
     )]);
-    let mut skybox = Mesh::from(shapes::Skybox {size: 100000.});
+    // let perlin_handle = asset_server.load("assets/quail-color.png").unwrap();
+
+    let perlin_handle = asset_server.load("assets/perlin.png").unwrap();
+
+    let mut skybox = Mesh::from(Quad { size: vec2(50000.0, 50000.0), flip: false  });
     let quad_handle = meshes.add(skybox);
     let sky_material_handle = skymaterials.add(SkyboxMaterial {
-        basecolor: Color::rgba(0.0, 0.0, 0.0, 1.0),
+        basecolor: Color::rgba(1.0, 1.0, 1.0, 1.0),
+        texture: Some(perlin_handle),
     });
     // backgroundhandle.background = Some(quad_handle);
     commands

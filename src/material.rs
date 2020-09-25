@@ -32,4 +32,6 @@ pub struct GlobalMaterial {
 #[derive(RenderResources, ShaderDefs)]
 pub struct SkyboxMaterial {
     pub basecolor: Color,
+    #[shader_def]
+    pub texture: Option<Handle<Texture>>,
 }
