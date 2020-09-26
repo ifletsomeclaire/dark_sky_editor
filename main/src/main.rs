@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin, PrintDiagnosticsPlugin},
     math::vec2,
@@ -20,11 +22,12 @@ use bevy::{
 };
 
 use camera::{camera_movement, update_camera_distance, CameraMarker, MouseState};
-use material::{GlobalMaterial, MeshMaterial, SkyboxMaterial};
+use material::{GlobalMaterial, MeshMaterial};
 use mesh::{EditableMesh, MeshMaker};
 use node_graph::{Graph, Ship};
 use shape::Quad;
-use shapes::Skybox;
+// use shapes::Skybox;
+use skybox::plugin::SkyboxPlugin;
 use texture_atlas::{load_atlas, ta_setup, AtlasInfo, AtlasSpriteHandles};
 
 // mod bevy_lyon;
@@ -36,7 +39,7 @@ mod material;
 mod mesh;
 mod node_graph;
 mod othercamera;
-mod shapes;
+// mod shapes;
 mod texture_atlas;
 use othercamera::*;
 #[derive(Default, Debug)]
@@ -55,10 +58,15 @@ fn main() {
         .init_resource::<MeshHandles>()
         // .init_resource::<AtlasSpriteHandles>()
         .add_asset::<MeshMaterial>()
-        .add_asset::<SkyboxMaterial>()
+        // .add_asset::<SkyboxMaterial>()
         .add_asset::<GlobalMaterial>()
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(PrintDiagnosticsPlugin::default())
+        .add_plugin(SkyboxPlugin {
+            size: 30000.,
+            texture: Some(PathBuf::from("E:/Rust/Projects/dark_sky_editor/assets/STSCI-H-p1917b-q-5198x4801.png")),
+            ..Default::default()
+        })
         .add_startup_system(setup.system())
         .add_startup_system(setup_player.system())
         // .add_startup_system(background.system())
@@ -75,10 +83,10 @@ fn main() {
             stage::POST_UPDATE,
             bevy::render::shader::asset_shader_defs_system::<MeshMaterial>.system(),
         )
-        .add_system_to_stage(
-            stage::POST_UPDATE,
-            bevy::render::shader::asset_shader_defs_system::<SkyboxMaterial>.system(),
-        )
+        // .add_system_to_stage(
+        //     stage::POST_UPDATE,
+        //     bevy::render::shader::asset_shader_defs_system::<SkyboxMaterial>.system(),
+        // )
         .run();
 }
 
@@ -94,7 +102,7 @@ fn setup(
     mut shaders: ResMut<Assets<Shader>>,
     mut render_graph: ResMut<RenderGraph>,
     mut materials: ResMut<Assets<MeshMaterial>>,
-    mut skymaterials: ResMut<Assets<SkyboxMaterial>>,
+    // mut skymaterials: ResMut<Assets<SkyboxMaterial>>,
     mut globalmat: ResMut<Assets<GlobalMaterial>>,
     mut textures: ResMut<Assets<Texture>>,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -141,70 +149,70 @@ fn setup(
             ..Default::default()
         },
     )]);
-    let skybox_pipeline_handle = pipelines.add(PipelineDescriptor::default_config(ShaderStages {
-        vertex: shaders.add(Shader::from_glsl(
-            ShaderStage::Vertex,
-            include_str!("../shaders/vert_shader.vert"),
-        )),
-        fragment: Some(shaders.add(Shader::from_glsl(
-            ShaderStage::Fragment,
-            include_str!("../shaders/frag_shader.frag"),
-        ))),
-    }));
-    render_graph.add_system_node(
-        "skybox_material",
-        AssetRenderResourcesNode::<SkyboxMaterial>::new(true),
-    );
-    render_graph
-        .add_node_edge("skybox_material", base::node::MAIN_PASS)
-        .unwrap();
-    let sky_specialized_pipeline =
-        RenderPipelines::from_pipelines(vec![RenderPipeline::specialized(
-            skybox_pipeline_handle,
-            PipelineSpecialization {
-                dynamic_bindings: vec![
-                    // Transform
-                    DynamicBinding {
-                        bind_group: 2,
-                        binding: 0,
-                    },
-                    // SkyboxMaterial_basecolor
-                    DynamicBinding {
-                        bind_group: 3,
-                        binding: 0,
-                    },
-                ],
-                ..Default::default()
-            },
-        )]);
-    // let perlin_handle = asset_server.load("assets/quail-color.png").unwrap();
+    // let skybox_pipeline_handle = pipelines.add(PipelineDescriptor::default_config(ShaderStages {
+    //     vertex: shaders.add(Shader::from_glsl(
+    //         ShaderStage::Vertex,
+    //         include_str!("../shaders/vert_shader.vert"),
+    //     )),
+    //     fragment: Some(shaders.add(Shader::from_glsl(
+    //         ShaderStage::Fragment,
+    //         include_str!("../shaders/frag_shader.frag"),
+    //     ))),
+    // }));
+    // render_graph.add_system_node(
+    //     "skybox_material",
+    //     AssetRenderResourcesNode::<SkyboxMaterial>::new(true),
+    // );
+    // render_graph
+    //     .add_node_edge("skybox_material", base::node::MAIN_PASS)
+    //     .unwrap();
+    // let sky_specialized_pipeline =
+    //     RenderPipelines::from_pipelines(vec![RenderPipeline::specialized(
+    //         skybox_pipeline_handle,
+    //         PipelineSpecialization {
+    //             dynamic_bindings: vec![
+    //                 // Transform
+    //                 DynamicBinding {
+    //                     bind_group: 2,
+    //                     binding: 0,
+    //                 },
+    //                 // SkyboxMaterial_basecolor
+    //                 DynamicBinding {
+    //                     bind_group: 3,
+    //                     binding: 0,
+    //                 },
+    //             ],
+    //             ..Default::default()
+    //         },
+    //     )]);
+    // // let perlin_handle = asset_server.load("assets/quail-color.png").unwrap();
 
-    let perlin_handle = asset_server
-        .load("assets/STSCI-H-p1917b-q-5198x4801.png")
-        .unwrap();
+    // let perlin_handle = asset_server
+    //     .load("assets/STSCI-H-p1917b-q-5198x4801.png")
+    //     .unwrap();
 
-    let mut skybox = Mesh::from(Quad {
-        size: vec2(30000.0, 30000.0),
-        flip: false,
-    });
-    let quad_handle = meshes.add(skybox);
-    let sky_material_handle = skymaterials.add(SkyboxMaterial {
-        basecolor: Color::rgba(1.0, 1.0, 1.0, 1.0),
-        texture: Some(perlin_handle),
-    });
-    // backgroundhandle.background = Some(quad_handle);
-    commands
-        // textured quad - normal
-        .spawn(MeshComponents {
-            mesh: quad_handle,
-            draw: Draw {
-                is_transparent: true,
-                ..Default::default()
-            },
-            render_pipelines: sky_specialized_pipeline,
-            ..Default::default()
-        })
-        .with(sky_material_handle);
+    // let mut skybox = Mesh::from(Quad {
+    //     size: vec2(30000.0, 30000.0),
+    //     flip: false,
+    // });
+    // let quad_handle = meshes.add(skybox);
+    // let sky_material_handle = skymaterials.add(SkyboxMaterial {
+    //     basecolor: Color::rgba(1.0, 1.0, 1.0, 1.0),
+    //     texture: Some(perlin_handle),
+    // });
+    // // backgroundhandle.background = Some(quad_handle);
+    // commands
+    //     // textured quad - normal
+    //     .spawn(MeshComponents {
+    //         mesh: quad_handle,
+    //         draw: Draw {
+    //             is_transparent: true,
+    //             ..Default::default()
+    //         },
+    //         render_pipelines: sky_specialized_pipeline,
+    //         ..Default::default()
+    //     })
+    //     .with(sky_material_handle);
 
     commands
         .spawn(Camera3dComponents {
@@ -315,8 +323,14 @@ fn setup(
                 // m_maker.vert_uvs.push(uv);
             }
 
-            for ind in quad.indices.unwrap() {
-                m_maker.indices.push(ind + count as u32);
+            match quad.indices.unwrap() {
+                bevy::render::mesh::Indices::U16(_) => {}
+                bevy::render::mesh::Indices::U32(i) => {
+                    for ind in i {
+                        m_maker.indices.push(ind + count as u32);
+                    }
+        
+                }
             }
 
             commands.spawn((Ship {
@@ -441,35 +455,35 @@ fn move_player(key: Res<Input<KeyCode>>, mut query: Query<(&Player, &mut Transfo
     }
 }
 
-fn background(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut backgroundhandle: ResMut<MeshHandles>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut textures: ResMut<Assets<Texture>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-) {
-    let mut mesh = Mesh::from(shapes::Skybox { size: 10000000. });
-    let quad_handle = meshes.add(mesh);
-    let red_material_handle = materials.add(StandardMaterial {
-        albedo: Color::rgba(0.0, 0.0, 0.0, 1.0),
-        // albedo_texture: Some(texture_handle),
-        shaded: false,
-        ..Default::default()
-    });
-    backgroundhandle.background = Some(quad_handle);
-    commands
-        // textured quad - normal
-        .spawn(PbrComponents {
-            mesh: quad_handle,
-            material: red_material_handle,
-            draw: Draw {
-                is_transparent: true,
-                ..Default::default()
-            },
-            ..Default::default()
-        });
-}
+// fn background(
+//     mut commands: Commands,
+//     asset_server: Res<AssetServer>,
+//     mut backgroundhandle: ResMut<MeshHandles>,
+//     mut meshes: ResMut<Assets<Mesh>>,
+//     mut textures: ResMut<Assets<Texture>>,
+//     mut materials: ResMut<Assets<StandardMaterial>>,
+// ) {
+//     let mut mesh = Mesh::from(shapes::Skybox { size: 10000000. });
+//     let quad_handle = meshes.add(mesh);
+//     let red_material_handle = materials.add(StandardMaterial {
+//         albedo: Color::rgba(0.0, 0.0, 0.0, 1.0),
+//         // albedo_texture: Some(texture_handle),
+//         shaded: false,
+//         ..Default::default()
+//     });
+//     backgroundhandle.background = Some(quad_handle);
+//     commands
+//         // textured quad - normal
+//         .spawn(PbrComponents {
+//             mesh: quad_handle,
+//             material: red_material_handle,
+//             draw: Draw {
+//                 is_transparent: true,
+//                 ..Default::default()
+//             },
+//             ..Default::default()
+//         });
+// }
 
 fn move_ship(mut meshes: ResMut<Assets<Mesh>>, handles: Res<Handles>, mut query: Query<&Ship>) {
     if let Some(mesh) = meshes.get_mut(&handles.mesh_handle) {

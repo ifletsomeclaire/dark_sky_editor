@@ -1,4 +1,4 @@
-use bevy::{prelude::Mesh, render::mesh::VertexAttribute, render::pipeline::PrimitiveTopology};
+use bevy::{prelude::Mesh, render::mesh::Indices, render::mesh::VertexAttribute, render::pipeline::PrimitiveTopology};
 
 pub struct MeshMaker {
     pub vert_pos: Vec<[f32; 3]>,
@@ -21,7 +21,7 @@ impl MeshMaker {
     }
     pub fn generate_mesh(&self) -> Mesh {
         let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-        mesh.indices = Some(self.indices.clone());
+        mesh.indices = Some(Indices::U32(self.indices.clone()));
         mesh.attributes
             .push(VertexAttribute::position(self.vert_pos.clone()));
         mesh.attributes
