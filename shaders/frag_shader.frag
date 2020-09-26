@@ -58,13 +58,22 @@ void main() {
             v_Uv);
     # endif
 
-    output_color.y = output_color.x;
-    output_color.z = output_color.x;
-    output_color.a = output_color.x;
+    // output_color.y = output_color.x;
+    // output_color.z = output_color.x;
+    // output_color.a = output_color.x;
 
-    if (output_color[0] > 0.49) {
-        o_Target = vec4(1.0, 1.0, 1.0, 1.0);
-    } else {
-    o_Target = output_color;
-    }
+    // if (output_color[0] > 0.49) {
+    //     o_Target = vec4(1.0, 1.0, 1.0, 1.0);
+    // } else {
+    // if (output_color[0] > 0.7) {
+
+
+    o_Target = output_color * vec4(0.7, 0.7, 0.7, 1.0);
+
+
+    // } else {
+    // o_Target = output_color;
+
+    // }
+    // }
 }

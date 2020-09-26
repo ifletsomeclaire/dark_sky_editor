@@ -100,11 +100,11 @@ if (v_Lod > 2000.0) {
     }
     output_color.xyz *= color;
 # endif
-    vec4 blue = vec4(0.0, 0.0, 1.0, 1.0);
-    if (output_color.a > 0.0) {
+    // vec4 blue = vec4(0.0, 0.0, 1.0, 1.0);
+    // if (output_color.a > 0.0) {
         o_Target = output_color;
-    } else {
-        o_Target = vec4(blue[0], blue[1], blue[2], v_Uv[0]);  
-    }
+    // } else {
+        // o_Target = vec4(blue[0], blue[1], blue[2], v_Uv[0]);  
+    // }
     // multiply the light by material color
 }

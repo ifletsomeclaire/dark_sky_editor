@@ -1,10 +1,13 @@
 use bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin, PrintDiagnosticsPlugin},
     math::vec2,
+    math::vec3,
     math::vec4,
     prelude::*,
+    render::camera::Camera,
     render::camera::OrthographicProjection,
     render::camera::PerspectiveProjection,
+    render::camera::WindowOrigin,
     render::pipeline::DynamicBinding,
     render::pipeline::PipelineDescriptor,
     render::pipeline::PipelineSpecialization,
@@ -26,13 +29,16 @@ use texture_atlas::{load_atlas, ta_setup, AtlasInfo, AtlasSpriteHandles};
 
 // mod bevy_lyon;
 mod camera;
-mod shapes;
+use camera::*;
+
 mod dds_import;
 mod material;
 mod mesh;
 mod node_graph;
+mod othercamera;
+mod shapes;
 mod texture_atlas;
-
+use othercamera::*;
 #[derive(Default, Debug)]
 pub struct Handles {
     pub mesh_handle: Handle<Mesh>,
@@ -54,12 +60,16 @@ fn main() {
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(PrintDiagnosticsPlugin::default())
         .add_startup_system(setup.system())
+        .add_startup_system(setup_player.system())
         // .add_startup_system(background.system())
         // .add_startup_system(ta_setup.system())
         // .add_system(load_atlas.system())
         .add_system(camera_movement.system())
+        .add_system(camera_fucking_blows.system())
         .add_system(update_camera_distance.system())
         .add_system(move_ship.system())
+        .add_system(move_player.system())
+        // .add_system(rts_camera_system.system())
         // .add_system(aspect_ratio.system())
         .add_system_to_stage(
             stage::POST_UPDATE,
@@ -148,29 +158,35 @@ fn setup(
     render_graph
         .add_node_edge("skybox_material", base::node::MAIN_PASS)
         .unwrap();
-    let sky_specialized_pipeline = RenderPipelines::from_pipelines(vec![RenderPipeline::specialized(
-        skybox_pipeline_handle,
-        PipelineSpecialization {
-            dynamic_bindings: vec![
-                // Transform
-                DynamicBinding {
-                    bind_group: 2,
-                    binding: 0,
-                },
-                // SkyboxMaterial_basecolor
-                DynamicBinding {
-                    bind_group: 3,
-                    binding: 0,
-                },
-            ],
-            ..Default::default()
-        },
-    )]);
+    let sky_specialized_pipeline =
+        RenderPipelines::from_pipelines(vec![RenderPipeline::specialized(
+            skybox_pipeline_handle,
+            PipelineSpecialization {
+                dynamic_bindings: vec![
+                    // Transform
+                    DynamicBinding {
+                        bind_group: 2,
+                        binding: 0,
+                    },
+                    // SkyboxMaterial_basecolor
+                    DynamicBinding {
+                        bind_group: 3,
+                        binding: 0,
+                    },
+                ],
+                ..Default::default()
+            },
+        )]);
     // let perlin_handle = asset_server.load("assets/quail-color.png").unwrap();
 
-    let perlin_handle = asset_server.load("assets/perlin.png").unwrap();
+    let perlin_handle = asset_server
+        .load("assets/STSCI-H-p1917b-q-5198x4801.png")
+        .unwrap();
 
-    let mut skybox = Mesh::from(Quad { size: vec2(50000.0, 50000.0), flip: false  });
+    let mut skybox = Mesh::from(Quad {
+        size: vec2(30000.0, 30000.0),
+        flip: false,
+    });
     let quad_handle = meshes.add(skybox);
     let sky_material_handle = skymaterials.add(SkyboxMaterial {
         basecolor: Color::rgba(1.0, 1.0, 1.0, 1.0),
@@ -187,14 +203,14 @@ fn setup(
             },
             render_pipelines: sky_specialized_pipeline,
             ..Default::default()
-        }).with(sky_material_handle);
-
+        })
+        .with(sky_material_handle);
 
     commands
         .spawn(Camera3dComponents {
             // global_transform
             transform: Transform::new(Mat4::face_toward(
-                Vec3::new(0.0, -0.01, 5000.0),
+                Vec3::new(0.0, -1000.01, 15000.0),
                 Vec3::new(0.0, 0.0, 0.0),
                 Vec3::new(0.0, 0.0, 1.0),
             )),
@@ -202,9 +218,8 @@ fn setup(
                 far: f32::MAX,
                 ..Default::default()
             },
-            // perspective_projection: PerspectiveProjection {
-            //     far: 200000.,
-
+            // orthographic_projection: OrthographicProjection {
+            //     far: f32::MAX,
             //     ..Default::default()
             // },
             ..Default::default()
@@ -259,7 +274,7 @@ fn setup(
 
     let mut z_value: f32 = 0.0;
     for seed in 1..2 {
-        let graph = Graph::new(10, 15, 15, seed);
+        let graph = Graph::new(10, 60, 60, seed);
         println!("nodes: {}", graph.nodes.len());
         let mut meshmakers = Vec::new();
         let mut m_maker = MeshMaker::new();
@@ -297,7 +312,6 @@ fn setup(
                         _ => rect.max[1] / atlas_size[1],
                     },
                 ]);
-
                 // m_maker.vert_uvs.push(uv);
             }
 
@@ -331,6 +345,8 @@ fn setup(
                         is_transparent: true,
                         ..Default::default()
                     },
+                    transform: Transform::from_rotation(Quat::from_rotation_z(3.14)),
+                    // global_transform: GlobalTransform::from_rotation(Quat::from_rotation_y(2.0)),
                     ..Default::default()
                 })
                 .with(handle_res.global_mat)
@@ -366,6 +382,65 @@ fn aspect_ratio(mut meshes: ResMut<Assets<Mesh>>, handle: Res<MeshHandles>, wind
     }
 }
 
+fn setup_player(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut textures: ResMut<Assets<Texture>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    let texture_handle = asset_server
+        .load_sync(&mut textures, "assets/flycatcher.png")
+        .unwrap();
+    let texture = textures.get(&texture_handle).unwrap();
+    let aspect = texture.aspect();
+
+    let quad_handle = meshes.add(Mesh::from(shape::Quad::new(Vec2::new(
+        texture.size.x(),
+        texture.size.y(),
+    ))));
+    let material_handle = materials.add(StandardMaterial {
+        albedo_texture: Some(texture_handle),
+        shaded: false,
+        ..Default::default()
+    });
+    commands
+        // textured quad - normal
+        .spawn(PbrComponents {
+            mesh: quad_handle,
+            material: material_handle,
+            transform: Transform::from_translation_rotation(
+                Vec3::new(0.0, -1000.01, 8000.),
+                Quat::from_rotation_x(-std::f32::consts::PI / 5.0),
+            ),
+            draw: Draw {
+                is_transparent: true,
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .with(Player);
+}
+
+struct Player;
+
+fn move_player(key: Res<Input<KeyCode>>, mut query: Query<(&Player, &mut Transform)>) {
+    for (_, mut trans) in &mut query.iter() {
+        if key.pressed(KeyCode::W) {
+            trans.translate(vec3(0.0, 2.0, 0.0))
+        }
+        if key.pressed(KeyCode::A) {
+            trans.translate(vec3(-2.0, 0.0, 0.0))
+        }
+        if key.pressed(KeyCode::S) {
+            trans.translate(vec3(0.0, -2.0, 0.0))
+        }
+        if key.pressed(KeyCode::D) {
+            trans.translate(vec3(2.0, 0.0, 0.0))
+        }
+    }
+}
+
 fn background(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -374,7 +449,7 @@ fn background(
     mut textures: ResMut<Assets<Texture>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let mut mesh = Mesh::from(shapes::Skybox {size: 10000000.});
+    let mut mesh = Mesh::from(shapes::Skybox { size: 10000000. });
     let quad_handle = meshes.add(mesh);
     let red_material_handle = materials.add(StandardMaterial {
         albedo: Color::rgba(0.0, 0.0, 0.0, 1.0),
@@ -402,7 +477,7 @@ fn move_ship(mut meshes: ResMut<Assets<Mesh>>, handles: Res<Handles>, mut query:
             for ship in &mut query.iter() {
                 // if ship.texture_index < 1.5 {
                 for index in ship.vert_indices.clone() {
-                    positions[index as usize][0] -= 0.1;
+                    positions[index as usize][1] += 0.7;
                 }
                 // }
             }
