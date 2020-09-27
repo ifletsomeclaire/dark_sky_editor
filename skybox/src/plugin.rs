@@ -1,9 +1,10 @@
-use std::path::PathBuf;
+use std::{fs::File, io::Write, path::Path, path::PathBuf};
 
 use bevy::{
     math::vec2,
     prelude::*,
     render::{
+        mesh::Indices,
         mesh::VertexAttribute,
         pipeline::DynamicBinding,
         pipeline::PipelineDescriptor,
@@ -19,6 +20,8 @@ use bevy::{
 };
 use shader::{ShaderStage, ShaderStages};
 use shape::Quad;
+
+use crate::sky_sphere::SkySphere;
 
 const SKYBOX_PIPELINE_HANDLE: Handle<PipelineDescriptor> =
     Handle::from_u128(189483623150127713895864825450987265104);
@@ -121,74 +124,17 @@ fn skybox_startup(
         )]);
 
     let s = skybox.plugin.size;
-    let vertices = vec![
-        // behind center
-        ([-s, -s,  s], [ 0.,  0.,  -1.], [1., 0.]),
-        ([ s, -s,  s], [ 0.,  0.,  -1.], [0., 0.]),
-        ([-s,  s,  s], [ 0.,  0.,  -1.], [1., 1.]),
-        ([ s,  s,  s], [ 0.,  0.,  -1.], [0., 1.]),
-        // straight ahead
-        ([ s, -s, -s], [ 0.,  0., 1.], [1., 0.]),
-        ([-s, -s, -s], [ 0.,  0., 1.], [0., 0.]),
-        ([ s,  s, -s], [ 0.,  0., 1.], [1., 1.]),
-        ([-s,  s, -s], [ 0.,  0., 1.], [0., 1.]),
-        // right
-        ([ s, -s,  s], [ -1.,  0.,  0.], [1., 0.]),
-        ([ s, -s, -s], [ -1.,  0.,  0.], [0., 0.]),
-        ([ s,  s,  s], [ -1.,  0.,  0.], [1., 1.]),
-        ([ s,  s, -s], [ -1.,  0.,  0.], [0., 1.]),
-        // left
-        ([-s, -s, -s], [1.,  0.,  0.], [1., 0.]),
-        ([-s, -s,  s], [1.,  0.,  0.], [0., 0.]),
-        ([-s,  s, -s], [1.,  0.,  0.], [1., 1.]),
-        ([-s,  s,  s], [1.,  0.,  0.], [0., 1.]),
-        // up
-        ([-s,  s,  s], [ 0.,  -1.,  0.], [1., 0.]),
-        ([ s,  s,  s], [ 0.,  -1.,  0.], [0., 0.]),
-        ([-s,  s, -s], [ 0.,  -1.,  0.], [1., 1.]),
-        ([ s,  s, -s], [ 0.,  -1.,  0.], [0., 1.]),
-        // down
-        ([-s, -s, -s], [ 0., 1.,  0.], [1., 0.]),
-        ([ s, -s, -s], [ 0., 1.,  0.], [0., 0.]),
-        ([-s, -s,  s], [ 0., 1.,  0.], [1., 1.]),
-        ([ s, -s,  s], [ 0., 1.,  0.], [0., 1.]),
-    ];
+    let skymesh = Mesh::from(SkySphere {
+        radius: s,
+        subdivisions: 50,
+    });
+    // let outputfile = &mut File::create(&Path::new(&format!("skybox.txt"))).unwrap();
+    // outputfile.write_all(format!("{:#?}", skymesh).as_bytes()).expect("else");
 
-    let mut positions = Vec::new();
-    let mut normals = Vec::new();
-    let mut uvs = Vec::new();
-    for (position, normal, uv) in vertices {
-        positions.push(position);
-        normals.push(normal);
-        uvs.push(uv);
-    }
-
-    let skymesh = Mesh {
-        primitive_topology: PrimitiveTopology::TriangleList,
-        attributes: vec![
-            VertexAttribute::position(positions),
-            VertexAttribute::normal(normals),
-            VertexAttribute::uv(uvs),
-        ],
-        indices: Some(bevy::render::mesh::Indices::U32(vec![
-            // FUCKING CLOCKWISE TRIANGLES
-            2, 1, 0, 3, 1, 2, 
-            6, 5, 4, 7, 5, 6, 
-            10, 9, 8, 11, 9, 10, 
-            14, 13, 12, 15, 13, 14, 
-            18, 17, 16, 19, 17, 18, 
-            22, 21, 20, 23, 21, 22,
-            // 0, 1, 2, 2, 1, 3, 
-            // 4, 5, 6, 6, 5, 7, 
-            // 8, 9, 10, 10, 9, 11, 
-            // 12, 13, 14, 14, 13, 15, 
-            // 16, 17, 18, 18, 17, 19, 
-            // 20, 21, 22, 22, 21, 23,
-        ])),
-    };
+    // skymesh.indices = reverse_triangles(skymesh.indices);
     skybox.mesh_handle = Some(meshes.add(skymesh));
 
-    // skybox.mesh_handle = Some(meshes.add(Mesh::from(Quad {
+    // skybox.mesh_handle = Some(meshes.add(Mesh::from(shape::Quad {
     //     size: vec2(skybox.plugin.size, skybox.plugin.size),
     //     flip: false,
     // })));
@@ -218,4 +164,23 @@ fn skybox_startup(
             ..Default::default()
         })
         .with(skybox.material_handle.unwrap());
+}
+
+pub fn reverse_triangles(indices: Option<Indices>) -> Option<Indices> {
+    if let Some(i) = indices {
+        match i {
+            Indices::U16(_) => None,
+            Indices::U32(ind) => {
+                let mut reversed = Vec::new();
+                for triangle in ind.rchunks_exact(3) {
+                    reversed.push(triangle[2]);
+                    reversed.push(triangle[1]);
+                    reversed.push(triangle[0]);
+                }
+                Some(Indices::U32(reversed))
+            }
+        }
+    } else {
+        None
+    }
 }

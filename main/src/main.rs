@@ -23,6 +23,7 @@ use bevy::{
 
 use camera::{camera_movement, update_camera_distance, CameraMarker, MouseState};
 use material::{GlobalMaterial, MeshMaterial};
+use mega_mesh::plugin::MegaMeshPlugin;
 use mesh::{EditableMesh, MeshMaker};
 use node_graph::{Graph, Ship};
 use shape::Quad;
@@ -60,6 +61,7 @@ fn main() {
         .add_asset::<MeshMaterial>()
         // .add_asset::<SkyboxMaterial>()
         .add_asset::<GlobalMaterial>()
+        .add_asset::<ColorMaterial>()
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(PrintDiagnosticsPlugin::default())
         .add_plugin(SkyboxPlugin {
@@ -67,6 +69,7 @@ fn main() {
             texture: Some(PathBuf::from("E:/Rust/Projects/dark_sky_editor/assets/STSCI-H-p1917b-q-5198x4801.png")),
             ..Default::default()
         })
+        .add_plugin(MegaMeshPlugin::default())
         .add_startup_system(setup.system())
         .add_startup_system(setup_player.system())
         // .add_startup_system(background.system())
