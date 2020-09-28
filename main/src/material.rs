@@ -35,3 +35,9 @@ pub struct SkyboxMaterial {
     #[shader_def]
     pub texture: Option<Handle<Texture>>,
 }
+#[derive(RenderResources, ShaderDefs, Default)]
+pub struct StarMaterial {
+    pub basecolor: Color,
+    #[shader_def]
+    pub texture: Option<Handle<Texture>>,
+}

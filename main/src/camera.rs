@@ -1,7 +1,4 @@
-use bevy::{
-    input::mouse::MouseMotion, input::mouse::MouseWheel, math::vec3, prelude::*,
-    render::camera::OrthographicProjection,
-};
+use bevy::{input::mouse::MouseMotion, input::mouse::MouseWheel, math::vec3, prelude::*, render::camera::Camera, render::camera::CameraProjection, render::camera::OrthographicProjection};
 
 use crate::{material::GlobalMaterial, material::MeshMaterial, Handles};
 
@@ -15,31 +12,36 @@ pub struct CameraMarker;
 pub fn camera_fucking_blows(
     key: Res<Input<KeyCode>>,
 
-    mut query: Query<(&CameraMarker, &mut OrthographicProjection)>,
+    mut query: Query<(&CameraMarker, &mut OrthographicProjection, &mut Camera)>,
 ) {
-    for (_, mut p) in &mut query.iter() {
+    for (_, mut p, mut cam) in &mut query.iter() {
         if key.pressed(KeyCode::F1) {
             println!(" BEFORE {:#?}", p);
-
-            p.near += 100.0;
+            p.bottom *= 0.99;
+            p.top *= 0.99;
+            p.right *= 0.99;
+            p.left *= 0.99;
             println!(" AFTER {:#?}", p);
         }
         if key.pressed(KeyCode::F2) {
             println!(" BEFORE {:#?}", p);
-            p.bottom -= 100.0;
-            p.top += 100.0;
-            p.right += 100.0;
-            p.left -= 100.0;
+            p.bottom *= 1.01;
+            p.top *= 1.01;
+            p.right *= 1.01;
+            p.left *= 1.01;
             println!(" AFTER {:#?}", p);
         }
-        if key.pressed(KeyCode::F3) {
-            p.right += 100.0;
-        }
-        if key.pressed(KeyCode::F4) {
-            p.near += 100.0;
-        }
-        if key.pressed(KeyCode::F5) {}
+        // if key.pressed(KeyCode::F3) {
+        //     p.right += 100.0;
+        // }
+        // if key.pressed(KeyCode::F4) {
+        //     p.near += 100.0;
+        // }
+        // if key.pressed(KeyCode::F5) {}
+
+        cam.projection_matrix = p.get_projection_matrix();
     }
+
 }
 pub fn camera_movement(
     click: Res<Input<MouseButton>>,

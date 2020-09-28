@@ -22,9 +22,10 @@ use bevy::{
 };
 
 use camera::{camera_movement, update_camera_distance, CameraMarker, MouseState};
-use material::{GlobalMaterial, MeshMaterial};
+use material::{GlobalMaterial, MeshMaterial, StarMaterial};
 use mega_mesh::plugin::MegaMeshPlugin;
 use mesh::{EditableMesh, MeshMaker};
+use meshie::generator::{DistributionFn, MeshBuilder, MeshConfig};
 use node_graph::{Graph, Ship};
 use shape::Quad;
 // use shapes::Skybox;
@@ -53,6 +54,7 @@ pub struct Handles {
 fn main() {
     App::build()
         .add_resource(Msaa { samples: 4 })
+        .add_resource(ClearColor(Color::BLACK))
         .add_default_plugins()
         .init_resource::<MouseState>()
         .init_resource::<Handles>()
@@ -61,15 +63,16 @@ fn main() {
         .add_asset::<MeshMaterial>()
         // .add_asset::<SkyboxMaterial>()
         .add_asset::<GlobalMaterial>()
+        .add_asset::<StarMaterial>()
         .add_asset::<ColorMaterial>()
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(PrintDiagnosticsPlugin::default())
-        .add_plugin(SkyboxPlugin {
-            size: 30000.,
-            texture: Some(PathBuf::from("E:/Rust/Projects/dark_sky_editor/assets/STSCI-H-p1917b-q-5198x4801.png")),
-            ..Default::default()
-        })
-        .add_plugin(MegaMeshPlugin::default())
+        // .add_plugin(SkyboxPlugin {
+        //     size: 30000.,
+        //     texture: Some(PathBuf::from("E:/Rust/Projects/dark_sky_editor/assets/STSCI-H-p1917b-q-5198x4801.png")),
+        //     ..Default::default()
+        // })
+        // .add_plugin(MegaMeshPlugin::default())
         .add_startup_system(setup.system())
         .add_startup_system(setup_player.system())
         // .add_startup_system(background.system())
@@ -85,6 +88,10 @@ fn main() {
         .add_system_to_stage(
             stage::POST_UPDATE,
             bevy::render::shader::asset_shader_defs_system::<MeshMaterial>.system(),
+        )
+        .add_system_to_stage(
+            stage::POST_UPDATE,
+            bevy::render::shader::asset_shader_defs_system::<StarMaterial>.system(),
         )
         // .add_system_to_stage(
         //     stage::POST_UPDATE,
@@ -105,6 +112,7 @@ fn setup(
     mut shaders: ResMut<Assets<Shader>>,
     mut render_graph: ResMut<RenderGraph>,
     mut materials: ResMut<Assets<MeshMaterial>>,
+    mut star_materials: ResMut<Assets<StarMaterial>>,
     // mut skymaterials: ResMut<Assets<SkyboxMaterial>>,
     mut globalmat: ResMut<Assets<GlobalMaterial>>,
     mut textures: ResMut<Assets<Texture>>,
@@ -152,87 +160,23 @@ fn setup(
             ..Default::default()
         },
     )]);
-    // let skybox_pipeline_handle = pipelines.add(PipelineDescriptor::default_config(ShaderStages {
-    //     vertex: shaders.add(Shader::from_glsl(
-    //         ShaderStage::Vertex,
-    //         include_str!("../shaders/vert_shader.vert"),
-    //     )),
-    //     fragment: Some(shaders.add(Shader::from_glsl(
-    //         ShaderStage::Fragment,
-    //         include_str!("../shaders/frag_shader.frag"),
-    //     ))),
-    // }));
-    // render_graph.add_system_node(
-    //     "skybox_material",
-    //     AssetRenderResourcesNode::<SkyboxMaterial>::new(true),
-    // );
-    // render_graph
-    //     .add_node_edge("skybox_material", base::node::MAIN_PASS)
-    //     .unwrap();
-    // let sky_specialized_pipeline =
-    //     RenderPipelines::from_pipelines(vec![RenderPipeline::specialized(
-    //         skybox_pipeline_handle,
-    //         PipelineSpecialization {
-    //             dynamic_bindings: vec![
-    //                 // Transform
-    //                 DynamicBinding {
-    //                     bind_group: 2,
-    //                     binding: 0,
-    //                 },
-    //                 // SkyboxMaterial_basecolor
-    //                 DynamicBinding {
-    //                     bind_group: 3,
-    //                     binding: 0,
-    //                 },
-    //             ],
-    //             ..Default::default()
-    //         },
-    //     )]);
-    // // let perlin_handle = asset_server.load("assets/quail-color.png").unwrap();
-
-    // let perlin_handle = asset_server
-    //     .load("assets/STSCI-H-p1917b-q-5198x4801.png")
-    //     .unwrap();
-
-    // let mut skybox = Mesh::from(Quad {
-    //     size: vec2(30000.0, 30000.0),
-    //     flip: false,
-    // });
-    // let quad_handle = meshes.add(skybox);
-    // let sky_material_handle = skymaterials.add(SkyboxMaterial {
-    //     basecolor: Color::rgba(1.0, 1.0, 1.0, 1.0),
-    //     texture: Some(perlin_handle),
-    // });
-    // // backgroundhandle.background = Some(quad_handle);
-    // commands
-    //     // textured quad - normal
-    //     .spawn(MeshComponents {
-    //         mesh: quad_handle,
-    //         draw: Draw {
-    //             is_transparent: true,
-    //             ..Default::default()
-    //         },
-    //         render_pipelines: sky_specialized_pipeline,
-    //         ..Default::default()
-    //     })
-    //     .with(sky_material_handle);
 
     commands
-        .spawn(Camera3dComponents {
+        .spawn(Camera2dComponents {
             // global_transform
             transform: Transform::new(Mat4::face_toward(
                 Vec3::new(0.0, -1000.01, 15000.0),
                 Vec3::new(0.0, 0.0, 0.0),
                 Vec3::new(0.0, 0.0, 1.0),
             )),
-            perspective_projection: PerspectiveProjection {
-                far: f32::MAX,
-                ..Default::default()
-            },
-            // orthographic_projection: OrthographicProjection {
+            // perspective_projection: PerspectiveProjection {
             //     far: f32::MAX,
             //     ..Default::default()
             // },
+            orthographic_projection: OrthographicProjection {
+                far: f32::MAX,
+                ..Default::default()
+            },
             ..Default::default()
         })
         .with(CameraMarker);
@@ -241,24 +185,6 @@ fn setup(
     for h in dds_import::dds_to_texture("assets/texture_atlas.dds") {
         texture_handles.push(textures.add(h))
     }
-    // println!("{:?}", texture_handles);
-
-    // for h in texture_handles {
-    // commands
-    //     .spawn(MeshComponents {
-    //         mesh: meshes.add(Mesh::from(shape::Quad {
-    //             size: vec2(100., 100.),
-    //             flip: false,
-    //         })),
-    //         render_pipelines: specialized_pipeline.clone(),
-    //         ..Default::default()
-    //     })
-    //     .with(materials.add(MeshMaterial {
-    //         basecolor: Color::from(vec4(1.0, 1.0, 1.0, 1.0)),
-    //         texture1: Some(texture_handles[4]),
-    //         shaded: false,
-    //     }));
-    // }
 
     // let atlas_handle = asset_server.load("assets/texture_atlas.png").unwrap();
     // let fly_handle = asset_server.load("assets/ship/model 512.png").unwrap();
@@ -332,7 +258,6 @@ fn setup(
                     for ind in i {
                         m_maker.indices.push(ind + count as u32);
                     }
-        
                 }
             }
 
@@ -370,6 +295,102 @@ fn setup(
                 .with(material);
         }
     }
+
+    let star_pipeline_handle = pipelines.add(PipelineDescriptor::default_config(ShaderStages {
+        vertex: shaders.add(Shader::from_glsl(
+            ShaderStage::Vertex,
+            include_str!("../shaders/star_vert_shader.vert"),
+        )),
+        fragment: Some(shaders.add(Shader::from_glsl(
+            ShaderStage::Fragment,
+            include_str!("../shaders/star_frag_shader.frag"),
+        ))),
+    }));
+    render_graph.add_system_node(
+        "star_material",
+        AssetRenderResourcesNode::<StarMaterial>::new(true),
+    );
+    render_graph
+        .add_node_edge("star_material", base::node::MAIN_PASS)
+        .unwrap();
+    let star_specialized_pipeline =
+        RenderPipelines::from_pipelines(vec![RenderPipeline::specialized(
+            star_pipeline_handle,
+            PipelineSpecialization {
+                dynamic_bindings: vec![
+                    // Transform
+                    DynamicBinding {
+                        bind_group: 2,
+                        binding: 0,
+                    },
+                    // StarMaterial_basecolor
+                    DynamicBinding {
+                        bind_group: 3,
+                        binding: 0,
+                    },
+                ],
+                ..Default::default()
+            },
+        )]);
+
+    let mat_handle = asset_server
+        .load("E:/Rust/Projects/dark_sky_editor/assets/STSCI-H-p1917b-q-5198x4801.png")
+        .unwrap();
+    let mut mesh_builder = MeshBuilder {
+        texture_atlas: mat_handle,
+        texture_size: vec2(5198., 4807.),
+        config: vec![],
+    };
+    mesh_builder.config.push(MeshConfig {
+        count: 1000000,
+        texture_position: bevy::sprite::Rect {
+            min: vec2(592., 863.),
+            max: vec2(601., 871.),
+        },
+        area: vec3(100000., 100000., 1000.),
+        distribution: DistributionFn::Random,
+    });
+    mesh_builder.config.push(MeshConfig {
+        count: 500000,
+        texture_position: bevy::sprite::Rect {
+            min: vec2(674., 857.),
+            max: vec2(685., 869.),
+        },
+        area: vec3(100000., 100000., 1000.),
+        distribution: DistributionFn::Random,
+    });
+    mesh_builder.config.push(MeshConfig {
+        count: 500000,
+        texture_position: bevy::sprite::Rect {
+            min: vec2(526., 854.),
+            max: vec2(543., 871.),
+        },
+        area: vec3(100000., 100000., 1000.),
+        distribution: DistributionFn::Random,
+    });
+    mesh_builder.config.push(MeshConfig {
+        count: 100000,
+        texture_position: bevy::sprite::Rect {
+            min: vec2(613., 880.),
+            max: vec2(656., 917.),
+        },
+        area: vec3(100000., 100000., 1000.),
+        distribution: DistributionFn::Random,
+    });
+    let mesh = mesh_builder.gen_mesh();
+
+    // let mut rng = StdRng::from_entropy();
+    let mesh_handle = meshes.add(mesh);
+    commands
+        .spawn(MeshComponents {
+            mesh: mesh_handle,
+            render_pipelines: star_specialized_pipeline,
+            ..Default::default()
+        })
+        .with(star_materials.add(StarMaterial {
+            texture: Some(mat_handle),
+            ..Default::default()
+        }));
 }
 #[derive(Default)]
 struct MeshHandles {
