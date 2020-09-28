@@ -38,7 +38,7 @@ fn setup(
         });
 
     let mat_handle = asset_server
-        .load("E:/Rust/Projects/dark_sky_editor/assets/STSCI-H-p1917b-q-5198x4801.png")
+        .load("../assets/STSCI-H-p1917b-q-5198x4801.png")
         .unwrap();
     let mut mesh_builder = MeshBuilder {
         texture_atlas: mat_handle,
