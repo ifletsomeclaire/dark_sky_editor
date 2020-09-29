@@ -41,7 +41,6 @@ fn setup(
         .load("../assets/STSCI-H-p1917b-q-5198x4801.png")
         .unwrap();
     let mut mesh_builder = MeshBuilder {
-        texture_atlas: mat_handle,
         texture_size: vec2(5198., 4807.),
         config: vec![],
     };

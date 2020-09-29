@@ -2,23 +2,14 @@ use std::path::PathBuf;
 
 use bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin, PrintDiagnosticsPlugin},
-    math::vec2,
-    math::vec3,
-    math::vec4,
+    math::{vec2, vec3, vec4},
     prelude::*,
-    render::camera::Camera,
-    render::camera::OrthographicProjection,
-    render::camera::PerspectiveProjection,
-    render::camera::WindowOrigin,
-    render::pipeline::DynamicBinding,
-    render::pipeline::PipelineDescriptor,
-    render::pipeline::PipelineSpecialization,
-    render::pipeline::RenderPipeline,
-    render::render_graph::base,
-    render::render_graph::AssetRenderResourcesNode,
-    render::render_graph::RenderGraph,
-    render::shader::ShaderStage,
-    render::shader::ShaderStages,
+    render::{
+        camera::{Camera, OrthographicProjection, PerspectiveProjection, WindowOrigin},
+        pipeline::{DynamicBinding, PipelineDescriptor, PipelineSpecialization, RenderPipeline},
+        render_graph::{base, AssetRenderResourcesNode, RenderGraph},
+        shader::{ShaderStage, ShaderStages},
+    },
 };
 
 use camera::{camera_movement, update_camera_distance, CameraMarker, MouseState};
@@ -35,6 +26,9 @@ use texture_atlas::{load_atlas, ta_setup, AtlasInfo, AtlasSpriteHandles};
 // mod bevy_lyon;
 mod camera;
 use camera::*;
+
+// mod starscape;
+
 
 mod dds_import;
 mod material;
@@ -175,8 +169,10 @@ fn setup(
             // },
             orthographic_projection: OrthographicProjection {
                 far: f32::MAX,
+
                 ..Default::default()
             },
+
             ..Default::default()
         })
         .with(CameraMarker);
@@ -334,10 +330,9 @@ fn setup(
         )]);
 
     let mat_handle = asset_server
-        .load("E:/Rust/Projects/dark_sky_editor/assets/STSCI-H-p1917b-q-5198x4801.png")
+        .load("../assets/STSCI-H-p1917b-q-5198x4801.png")
         .unwrap();
     let mut mesh_builder = MeshBuilder {
-        texture_atlas: mat_handle,
         texture_size: vec2(5198., 4807.),
         config: vec![],
     };
@@ -378,13 +373,14 @@ fn setup(
         distribution: DistributionFn::Random,
     });
     let mesh = mesh_builder.gen_mesh();
-
     // let mut rng = StdRng::from_entropy();
     let mesh_handle = meshes.add(mesh);
     commands
         .spawn(MeshComponents {
             mesh: mesh_handle,
             render_pipelines: star_specialized_pipeline,
+            transform: Transform::from_scale(0.1),
+
             ..Default::default()
         })
         .with(star_materials.add(StarMaterial {

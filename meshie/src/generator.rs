@@ -13,7 +13,6 @@ pub enum DistributionFn {
 }
 
 pub struct MeshBuilder {
-    pub texture_atlas: Handle<Texture>,
     pub texture_size: Vec2,
     pub config: Vec<MeshConfig>,
 }

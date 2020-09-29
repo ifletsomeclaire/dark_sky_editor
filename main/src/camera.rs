@@ -16,20 +16,20 @@ pub fn camera_fucking_blows(
 ) {
     for (_, mut p, mut cam) in &mut query.iter() {
         if key.pressed(KeyCode::F1) {
-            println!(" BEFORE {:#?}", p);
+            // println!(" BEFORE {:#?}", p);
             p.bottom *= 0.99;
             p.top *= 0.99;
             p.right *= 0.99;
             p.left *= 0.99;
-            println!(" AFTER {:#?}", p);
+            // println!(" AFTER {:#?}", p);
         }
         if key.pressed(KeyCode::F2) {
-            println!(" BEFORE {:#?}", p);
+            // println!(" BEFORE {:#?}", p);
             p.bottom *= 1.01;
             p.top *= 1.01;
             p.right *= 1.01;
             p.left *= 1.01;
-            println!(" AFTER {:#?}", p);
+            // println!(" AFTER {:#?}", p);
         }
         // if key.pressed(KeyCode::F3) {
         //     p.right += 100.0;
