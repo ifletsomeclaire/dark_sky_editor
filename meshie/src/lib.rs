@@ -97,6 +97,10 @@ pub fn translate_mesh(mesh: &mut Mesh, position: Vec3) {
     }
 }
 
+// pub fn remove(&mut Mesh, indices)
+
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
