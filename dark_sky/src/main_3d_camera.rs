@@ -1,29 +1,33 @@
 use bevy::{
     input::mouse::MouseMotion, input::mouse::MouseWheel, math::vec3, prelude::*,
     render::camera::Camera, render::camera::CameraProjection,
-    render::camera::OrthographicProjection,
+    render::camera::OrthographicProjection, render::camera::PerspectiveProjection,
 };
 
-pub struct DarkSkyCamera;
+pub struct Main3dCamera;
 
-impl Plugin for DarkSkyCamera {
+impl Plugin for Main3dCamera {
     fn build(&self, app: &mut AppBuilder) {
         app.init_resource::<MouseState>()
             .add_startup_system(add_camera.system())
-            .add_system(zoom.system())
+            // .add_system(zoom.system())
             .add_system(camera_movement.system());
     }
 }
 
 fn add_camera(mut commands: Commands) {
     commands
-        .spawn(Camera2dComponents {
+        .spawn(Camera3dComponents {
             transform: Transform::new(Mat4::face_toward(
-                Vec3::new(0.0, -1000.01, 15000.0),
+                Vec3::new(0.0, -1000.01, 2000.0),
                 Vec3::new(0.0, 0.0, 0.0),
                 Vec3::new(0.0, 0.0, 1.0),
             )),
-            orthographic_projection: OrthographicProjection {
+            // orthographic_projection: OrthographicProjection {
+            //     far: f32::MAX,
+            //     ..Default::default()
+            // },
+            perspective_projection: PerspectiveProjection {
                 far: f32::MAX,
                 ..Default::default()
             },
@@ -39,27 +43,27 @@ pub struct MouseState {
 }
 #[derive(Debug, Default)]
 pub struct CameraMarker;
-fn zoom(
-    key: Res<Input<KeyCode>>,
-    mut query: Query<(&CameraMarker, &mut OrthographicProjection, &mut Camera)>,
-) {
-    for (_, mut p, mut cam) in &mut query.iter() {
-        if key.pressed(KeyCode::F1) {
-            p.bottom *= 0.99;
-            p.top *= 0.99;
-            p.right *= 0.99;
-            p.left *= 0.99;
-            cam.projection_matrix = p.get_projection_matrix();
-        }
-        if key.pressed(KeyCode::F2) {
-            p.bottom *= 1.01;
-            p.top *= 1.01;
-            p.right *= 1.01;
-            p.left *= 1.01;
-            cam.projection_matrix = p.get_projection_matrix();
-        }
-    }
-}
+// fn zoom(
+//     key: Res<Input<KeyCode>>,
+//     mut query: Query<(&CameraMarker, &mut OrthographicProjection, &mut Camera)>,
+// ) {
+//     for (_, mut p, mut cam) in &mut query.iter() {
+//         if key.pressed(KeyCode::F1) {
+//             p.bottom *= 0.99;
+//             p.top *= 0.99;
+//             p.right *= 0.99;
+//             p.left *= 0.99;
+//             cam.projection_matrix = p.get_projection_matrix();
+//         }
+//         if key.pressed(KeyCode::F2) {
+//             p.bottom *= 1.01;
+//             p.top *= 1.01;
+//             p.right *= 1.01;
+//             p.left *= 1.01;
+//             cam.projection_matrix = p.get_projection_matrix();
+//         }
+//     }
+// }
 fn camera_movement(
     click: Res<Input<MouseButton>>,
     key: Res<Input<KeyCode>>,
