@@ -14,7 +14,6 @@ impl Plugin for Main3dCamera {
             .add_system(camera_movement.system());
     }
 }
-
 fn add_camera(mut commands: Commands) {
     commands
         .spawn(Camera3dComponents {
@@ -28,7 +27,8 @@ fn add_camera(mut commands: Commands) {
             //     ..Default::default()
             // },
             perspective_projection: PerspectiveProjection {
-                far: f32::MAX,
+                far: 300000.,
+                fov: std::f32::consts::PI / 4.0,
                 ..Default::default()
             },
             ..Default::default()
