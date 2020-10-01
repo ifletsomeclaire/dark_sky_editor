@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use components::DarkSkyComponentRegistry;
+use player_ship::PlayerShip;
 use main_2d_camera::Main2dCamera;
 use main_3d_camera::Main3dCamera;
 use meshie_ship_test::MeshieShipTest;
@@ -12,6 +13,8 @@ mod main_menu;
 mod material;
 mod meshie_ship_test;
 mod starmap;
+mod player_ship;
+
 fn main() {
     App::build()
         .add_resource(Msaa { samples: 4 })
@@ -21,6 +24,7 @@ fn main() {
         .add_plugin(Main3dCamera)
         .add_plugin(DarkSkyComponentRegistry)
         .add_plugin(StarMap)
+        .add_plugin(PlayerShip)
         .add_plugin(MeshieShipTest)
         // .add_plugin(main_menu::MainMenu)
         .run();

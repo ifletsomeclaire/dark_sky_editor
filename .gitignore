@@ -2,6 +2,7 @@
 # will have compiled files and executables
 /target/
 /assets/ship
+/assets/test_ships
 /assets/stars
 /assets/raw_skybox.png
 

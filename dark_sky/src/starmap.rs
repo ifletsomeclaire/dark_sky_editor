@@ -11,6 +11,8 @@ use meshie::generator::{DistributionFn, MeshBuilder, MeshConfig};
 use super::*;
 
 pub struct StarMap;
+pub const STAR_PIPELINE_HANDLE: Handle<PipelineDescriptor> =
+    Handle::from_u128(189483654225434513895898134820988150104);
 
 impl Plugin for StarMap {
     fn build(&self, app: &mut AppBuilder) {
@@ -32,7 +34,8 @@ fn start(
     mut star_materials: ResMut<Assets<StarMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
 ) {
-    let star_pipeline_handle = pipelines.add(PipelineDescriptor::default_config(ShaderStages {
+    // let star_pipeline_handle = pipelines.add(PipelineDescriptor::default_config(ShaderStages {
+    pipelines.set(STAR_PIPELINE_HANDLE,PipelineDescriptor::default_config(ShaderStages {
         vertex: shaders.add(Shader::from_glsl(
             ShaderStage::Vertex,
             include_str!("../../shaders/star_vert_shader.vert"),
@@ -51,7 +54,7 @@ fn start(
         .unwrap();
     let star_specialized_pipeline =
         RenderPipelines::from_pipelines(vec![RenderPipeline::specialized(
-            star_pipeline_handle,
+            STAR_PIPELINE_HANDLE,
             PipelineSpecialization {
                 dynamic_bindings: vec![
                     // Transform
@@ -70,7 +73,7 @@ fn start(
         )]);
 
     let mat_handle = asset_server
-        .load("X:/Rust Projects/dark_sky_editor/assets/STSCI-H-p1917b-q-5198x4801.png")
+        .load("../assets/STSCI-H-p1917b-q-5198x4801.png")
         .unwrap();
     let mut mesh_builder = MeshBuilder {
         texture_size: vec2(5198., 4807.),
@@ -118,7 +121,11 @@ fn start(
         .spawn(MeshComponents {
             mesh: mesh_handle,
             render_pipelines: star_specialized_pipeline,
-            transform: Transform::from_scale(0.1),
+            transform: Transform::from_translation_rotation_scale(vec3(0.0, 0.0, -100000.), Quat::default(), 1.0),
+            draw: Draw {
+                is_transparent: true,
+                ..Default::default()
+            },
 
             ..Default::default()
         })
