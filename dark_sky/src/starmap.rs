@@ -121,7 +121,7 @@ fn start(
         .spawn(MeshComponents {
             mesh: mesh_handle,
             render_pipelines: star_specialized_pipeline,
-            transform: Transform::from_translation_rotation_scale(vec3(0.0, 0.0, -100000.), Quat::default(), 1.0),
+            transform: Transform::from_translation_rotation_scale(vec3(0.0, 0.0, -5000.), Quat::default(), 1.0),
             draw: Draw {
                 is_transparent: true,
                 ..Default::default()

@@ -1,5 +1,5 @@
 use bevy::{
-    math::vec3,
+    math::*,
     prelude::*,
     render::camera::Camera,
     render::mesh::VertexAttribute,
@@ -164,11 +164,9 @@ pub fn distance(a: &Vec3, b: &Vec3) -> f32 {
 pub fn hypot(arguments: &[f32]) -> f32 {
     let mut y: f32 = 0_f32;
     let len = arguments.len();
-
     for i in 0..len {
         y += arguments[i].powi(2);
     }
-
     y.sqrt()
 }
 

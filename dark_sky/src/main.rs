@@ -14,6 +14,11 @@ mod material;
 mod meshie_ship_test;
 mod starmap;
 mod player_ship;
+mod equations_of_motion;
+
+
+
+
 
 fn main() {
     App::build()
@@ -29,3 +34,4 @@ fn main() {
         // .add_plugin(main_menu::MainMenu)
         .run();
 }
+

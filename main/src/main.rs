@@ -29,7 +29,6 @@ use camera::*;
 
 // mod starscape;
 
-
 mod dds_import;
 mod material;
 mod mesh;
@@ -117,11 +116,11 @@ fn setup(
     let pipeline_handle = pipelines.add(PipelineDescriptor::default_config(ShaderStages {
         vertex: shaders.add(Shader::from_glsl(
             ShaderStage::Vertex,
-            include_str!("../shaders/forward.vert"),
+            include_str!("../../shaders/forward.vert"),
         )),
         fragment: Some(shaders.add(Shader::from_glsl(
             ShaderStage::Fragment,
-            include_str!("../shaders/forward.frag"),
+            include_str!("../../shaders/forward.frag"),
         ))),
     }));
     render_graph.add_system_node(
@@ -283,7 +282,9 @@ fn setup(
                         is_transparent: true,
                         ..Default::default()
                     },
-                    transform: Transform::from_rotation(Quat::from_rotation_z(3.14)),
+                    transform: Transform::from_rotation(Quat::from_rotation_z(
+                        std::f32::consts::PI,
+                    )),
                     // global_transform: GlobalTransform::from_rotation(Quat::from_rotation_y(2.0)),
                     ..Default::default()
                 })
@@ -295,11 +296,11 @@ fn setup(
     let star_pipeline_handle = pipelines.add(PipelineDescriptor::default_config(ShaderStages {
         vertex: shaders.add(Shader::from_glsl(
             ShaderStage::Vertex,
-            include_str!("../shaders/star_vert_shader.vert"),
+            include_str!("../../shaders/star_vert_shader.vert"),
         )),
         fragment: Some(shaders.add(Shader::from_glsl(
             ShaderStage::Fragment,
-            include_str!("../shaders/star_frag_shader.frag"),
+            include_str!("../../shaders/star_frag_shader.frag"),
         ))),
     }));
     render_graph.add_system_node(

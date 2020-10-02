@@ -3,7 +3,6 @@ use bevy::{
     prelude::*,
 };
 use meshie::reverse_triangles;
-use rand::{FromEntropy, Rng, StdRng};
 
 /// This example spawns a large number of cubes, each with its own changing position and material
 /// This is intended to be a stress test of bevy's ability to render many objects with different properties
@@ -53,18 +52,12 @@ fn setup(
             ..Default::default()
         });
 
-    let mut rng = StdRng::from_entropy();
     let mut mesh = Mesh::from(shape::Cube { size: 60.0 });
     reverse_triangles(&mut mesh);
     let cube_handle = meshes.add(mesh);
     commands.spawn(PbrComponents {
         mesh: cube_handle,
         material: materials.add(StandardMaterial {
-            albedo: Color::rgb(
-                rng.gen_range(0.0, 1.0),
-                rng.gen_range(0.0, 1.0),
-                rng.gen_range(0.0, 1.0),
-            ),
             ..Default::default()
         }),
         // transform: Transform::from_translation(Vec3::new(

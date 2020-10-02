@@ -1,6 +1,10 @@
-use bevy::{diagnostic::{FrameTimeDiagnosticsPlugin, PrintDiagnosticsPlugin}, math::vec2, math::vec3, prelude::*};
+use bevy::{
+    diagnostic::{FrameTimeDiagnosticsPlugin, PrintDiagnosticsPlugin},
+    math::vec2,
+    math::vec3,
+    prelude::*,
+};
 use meshie::{add_mesh, reverse_triangles, translate_mesh};
-use rand::{FromEntropy, Rng, StdRng};
 
 fn main() {
     App::build()
@@ -32,9 +36,11 @@ fn setup(
             ..Default::default()
         });
 
-    let mut rng = StdRng::from_entropy();
     let mut mesh = Mesh::from(shape::Cube { size: 10.0 });
-    let mut mesh_two = Mesh::from(shape::Quad { size: vec2(100., 100.), flip: false  });
+    let mut mesh_two = Mesh::from(shape::Quad {
+        size: vec2(100., 100.),
+        flip: false,
+    });
     translate_mesh(&mut mesh_two, vec3(10., 0.0, -5.0));
     add_mesh(&mut mesh, &mesh_two);
     // reverse_triangles(&mut mesh);
@@ -42,11 +48,6 @@ fn setup(
     commands.spawn(PbrComponents {
         mesh: cube_handle,
         material: materials.add(StandardMaterial {
-            albedo: Color::rgb(
-                rng.gen_range(0.0, 1.0),
-                rng.gen_range(0.0, 1.0),
-                rng.gen_range(0.0, 1.0),
-            ),
             ..Default::default()
         }),
         // transform: Transform::from_translation(Vec3::new(
