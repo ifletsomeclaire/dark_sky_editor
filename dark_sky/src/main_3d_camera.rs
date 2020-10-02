@@ -18,7 +18,7 @@ fn add_camera(mut commands: Commands) {
     commands
         .spawn(Camera3dComponents {
             transform: Transform::new(Mat4::face_toward(
-                Vec3::new(0.0, -1000.01, 2000.0),
+                Vec3::new(0.0, -0.01, 5000.0),
                 Vec3::new(0.0, 0.0, 0.0),
                 Vec3::new(0.0, 0.0, 1.0),
             )),
@@ -28,7 +28,7 @@ fn add_camera(mut commands: Commands) {
             // },
             perspective_projection: PerspectiveProjection {
                 far: 300000.,
-                fov: std::f32::consts::PI / 4.0,
+                fov: std::f32::consts::PI / 6.0,
                 ..Default::default()
             },
             ..Default::default()
