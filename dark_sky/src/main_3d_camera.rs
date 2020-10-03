@@ -28,7 +28,7 @@ fn add_camera(mut commands: Commands) {
             // },
             perspective_projection: PerspectiveProjection {
                 far: 300000.,
-                fov: std::f32::consts::PI / 4.0,
+                fov: std::f32::consts::PI / 6.0,
                 ..Default::default()
             },
             ..Default::default()
