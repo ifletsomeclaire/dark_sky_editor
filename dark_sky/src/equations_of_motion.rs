@@ -1,9 +1,13 @@
 use bevy::math::*;
-
-struct Momentum {
-    thrust: f32,
-    max_rotation: f32,
-    inertia: Vec2,
+#[derive(Debug, Default, Copy, Clone)]
+pub struct Momentum {
+    pub thrust: f32,
+    pub max_rotation: f32,
+    pub inertia: Vec2,
+}
+#[derive(Debug, Default, Copy, Clone)]
+pub struct Destination {
+    pub d: Vec3
 }
 
 impl EquationsOfMotion for Momentum {
@@ -41,11 +45,15 @@ pub trait EquationsOfMotion {
         self.ticks_to_turn(angle) + self.ticks_to_stop()
     }
     fn ticks_to_dest(&self, current: Vec3, dest: Vec3) -> f32 {
-        self.distance(current, dest) / self.inertia().length().abs()
+        self.distance(&current, &dest) / self.inertia().length().abs()
     }
-    fn ticks_to_point_of_no_return(&self, current: Vec3, dest: Vec3) {
+    fn ticks_to_point_of_no_return(&self, current: Vec3, dest: Vec3) -> f32 {
         let angle = current.angle_between(dest);
         self.ticks_to_dest(current, dest) - self.ticks_to_turn_and_stop(angle)
+    }
+    fn intercept(&self, current: Vec3, target: Vec3, target_momentum: &Momentum) -> Vec2 {
+        let ticks_to_target = self.ticks_to_dest(current, target);
+        ticks_to_target * target_momentum.inertia
     }
     fn turn_to(&self, current: Vec3, dest: Vec3) -> f32 {
         let angle = current.angle_between(dest);
@@ -53,13 +61,7 @@ pub trait EquationsOfMotion {
         if angle.abs() < max {
             angle
         } else {
-            max
+            max.copysign(angle)
         }
     }
-}
-
-fn testy(mom: Momentum, v3: Vec3, v2: Vec2, q: Quat) {
-    // mom.distance(a, b)
-    // v.angle_between(other)
-    // v.truncate()
 }

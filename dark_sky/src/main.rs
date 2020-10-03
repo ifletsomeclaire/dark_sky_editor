@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use components::DarkSkyComponentRegistry;
+use motion_test::MotionTest;
 use player_ship::PlayerShip;
 use main_2d_camera::Main2dCamera;
 use main_3d_camera::Main3dCamera;
@@ -15,7 +16,7 @@ mod meshie_ship_test;
 mod starmap;
 mod player_ship;
 mod equations_of_motion;
-
+mod motion_test;
 
 
 
@@ -29,8 +30,9 @@ fn main() {
         .add_plugin(Main3dCamera)
         .add_plugin(DarkSkyComponentRegistry)
         .add_plugin(StarMap)
-        .add_plugin(PlayerShip)
+        // .add_plugin(PlayerShip)
         .add_plugin(MeshieShipTest)
+        .add_plugin(MotionTest)
         // .add_plugin(main_menu::MainMenu)
         .run();
 }

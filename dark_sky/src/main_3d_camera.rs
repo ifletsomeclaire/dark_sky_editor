@@ -18,7 +18,7 @@ fn add_camera(mut commands: Commands) {
     commands
         .spawn(Camera3dComponents {
             transform: Transform::new(Mat4::face_toward(
-                Vec3::new(0.0, -1000.01, 2000.0),
+                Vec3::new(0.0, -1000.01, 5000.0),
                 Vec3::new(0.0, 0.0, 0.0),
                 Vec3::new(0.0, 0.0, 1.0),
             )),
