@@ -55,13 +55,14 @@ pub trait EquationsOfMotion {
         let ticks_to_target = self.ticks_to_dest(current, target);
         ticks_to_target * target_momentum.inertia
     }
-    fn turn_to(&self, current: Vec3, dest: Vec3) -> f32 {
+    fn turn_to(&self, current: Vec3, dest: Vec3) -> (Vec3, f32) {
         let angle = current.angle_between(dest);
         let max = self.max_rotation();
+        let cross = current.cross(dest).normalize();
         if angle.abs() < max {
-            angle
+            (cross, angle)
         } else {
-            max.copysign(angle)
+            (cross, max)
         }
     }
 }

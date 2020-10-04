@@ -23,7 +23,7 @@ pub struct MeshMaterial {
     pub shaded: bool,
 }
 
-pub const GLOBALMATERIAL: u128 = 468344185765435115;
+// pub const GLOBALMATERIAL: u128 = 468344185765435115;
 #[derive(RenderResources, ShaderDefs)]
 pub struct GlobalMaterial {
     pub distance: f32,

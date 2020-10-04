@@ -1,7 +1,6 @@
 use bevy::{
     input::mouse::MouseMotion, input::mouse::MouseWheel, math::vec3, prelude::*,
-    render::camera::Camera, render::camera::CameraProjection,
-    render::camera::OrthographicProjection, render::camera::PerspectiveProjection,
+    render::camera::PerspectiveProjection,
 };
 
 pub struct Main3dCamera;

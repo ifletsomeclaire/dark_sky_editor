@@ -12,8 +12,8 @@ const LEFT_KEYS: &[KeyCode] = &[KeyCode::Left, KeyCode::A];
 const RIGHT_KEYS: &[KeyCode] = &[KeyCode::Right, KeyCode::D];
 const UP_KEYS: &[KeyCode] = &[KeyCode::Up, KeyCode::W];
 const DOWN_KEYS: &[KeyCode] = &[KeyCode::Down, KeyCode::S];
-const ZOOM_IN_KEYS: &[KeyCode] = &[KeyCode::Equals, KeyCode::Add];
-const ZOOM_OUT_KEYS: &[KeyCode] = &[KeyCode::Subtract, KeyCode::Minus];
+const ZOOM_IN_KEYS: &[KeyCode] = &[KeyCode::Equals, KeyCode::NumpadAdd];
+const ZOOM_OUT_KEYS: &[KeyCode] = &[KeyCode::NumpadSubtract, KeyCode::Minus];
 
 pub struct State {
     cursor_moved_event_reader: EventReader<CursorMoved>,

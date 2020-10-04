@@ -1,4 +1,4 @@
-use bevy::{math::vec3, prelude::*, render::pipeline::DynamicBinding, render::pipeline::PipelineSpecialization, render::pipeline::RenderPipeline};
+use bevy::{math::vec3, prelude::*};
 
 pub struct PlayerShip;
 
@@ -21,7 +21,7 @@ fn setup_player(
         .load_sync(&mut textures, "assets/flycatcher.png")
         .unwrap();
     let texture = textures.get(&texture_handle).unwrap();
-    let aspect = texture.aspect();
+    // let aspect = texture.aspect();
 
     let quad_handle = meshes.add(Mesh::from(shape::Quad::new(Vec2::new(
         texture.size.x(),

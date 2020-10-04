@@ -1,15 +1,13 @@
-use std::{fs::File, io::Write, path::Path, path::PathBuf};
+use std::{path::PathBuf};
 
 use bevy::{
-    math::vec2,
+    // math::vec2,
     prelude::*,
     render::{
         mesh::Indices,
-        mesh::VertexAttribute,
         pipeline::DynamicBinding,
         pipeline::PipelineDescriptor,
         pipeline::PipelineSpecialization,
-        pipeline::PrimitiveTopology,
         pipeline::RenderPipeline,
         render_graph::base,
         render_graph::AssetRenderResourcesNode,
@@ -19,7 +17,6 @@ use bevy::{
     },
 };
 use shader::{ShaderStage, ShaderStages};
-use shape::Quad;
 
 use crate::sky_sphere::SkySphere;
 
