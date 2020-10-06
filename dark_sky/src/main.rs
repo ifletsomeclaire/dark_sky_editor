@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use collision_rays::CollisionRay;
 use components::DarkSkyComponentRegistry;
 use motion_test::MotionTest;
 use player_ship::PlayerShip;
@@ -17,6 +18,7 @@ mod starmap;
 mod player_ship;
 mod equations_of_motion;
 mod motion_test;
+mod collision_rays;
 
 
 
@@ -31,8 +33,9 @@ fn main() {
         .add_plugin(DarkSkyComponentRegistry)
         .add_plugin(StarMap)
         // .add_plugin(PlayerShip)
-        .add_plugin(MeshieShipTest)
-        .add_plugin(MotionTest)
+        // .add_plugin(MeshieShipTest)
+        // .add_plugin(MotionTest)
+        .add_plugin(CollisionRay)
         // .add_plugin(main_menu::MainMenu)
         .run();
 }

@@ -81,17 +81,17 @@ fn movement(mut query: Query<(&mut Momentum, &Destination, &mut Transform)>) {
 
         transform.translate(momentum.inertia().extend(0.0));
 
-        println!(
-            "a {:<13?} d {:<13?} t {:<13?} f {:<13?} ax {:<13?}",
-            angle,
-            //  0,0
-            // angle_to_turn,
-            momentum.inertia,
-            transform.translation(),
-            // transform.rotation().to_axis_angle(),
-            facing,
-            axis
-        );
+        // println!(
+        //     "a {:<13?} d {:<13?} t {:<13?} f {:<13?} ax {:<13?}",
+        //     angle,
+        //     //  0,0
+        //     // angle_to_turn,
+        //     momentum.inertia,
+        //     transform.translation(),
+        //     // transform.rotation().to_axis_angle(),
+        //     facing,
+        //     axis
+        // );
     }
 }
 
