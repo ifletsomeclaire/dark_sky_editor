@@ -1,3 +1,4 @@
+#[derive(Clone)]
 pub(crate) struct Meshie {
     pub(crate) vertices: Vec<Vertex>,
     pub(crate) indices: Vec<Triangle>,
