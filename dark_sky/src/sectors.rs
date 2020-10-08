@@ -33,7 +33,7 @@ fn sector_init(
         let mut trans = Transform::default();
         let x = rng.gen_range(-15000., 15000.);
         let y = rng.gen_range(-15000., 15000.);
-        let z = rng.gen_range(3000., 3300.);
+        let z = rng.gen_range(0.0, 1.0);
         trans.translate(Vec3::new(x, y, z));
         vec_to_spawn.push((trans, Sector::default()));
         let mut other = Mesh::from(shape::Icosphere {
@@ -93,24 +93,83 @@ fn sector_movement_test_init(
             ..Default::default()
         })
         .with(Momentum {
-            max_rotation: 2.14,
-            thrust: 0.1,
-            ..Default::default()
+            max_rotation: 0.01,
+            thrust: 0.01,
+            inertia: vec2(10.01, 0.01),
         })
         .with(Destination {
             d: Vec3::new(2000., 3000., 0.0),
+        })
+        .with(MoveLogic {
+            state: MovementState::CancelBadMomentumVector,
         });
 }
+struct MoveLogic {
+    state: MovementState,
+}
+enum MovementState {
+    Stop,
+    FlyTo,
+    CancelBadMomentumVector,
+    Turning,
+}
+const ANGLE_EPSILON: f32 = 0.0001;
+impl MovementState {
+    fn evaluate_state(&mut self, current: &Vec3, momentum: &Vec3, dest: &Vec3) {
+        match self {
+            Self::Stop => {
+                if self.distance_to(current, dest) > 30.0 {
+                    *self = Self::Turning;
+                }
+            }
+            Self::FlyTo => {
+                let bad_mom_vector = self.get_bad_mom(&momentum, &dest);
+                if bad_mom_vector.angle_between(*momentum) < ANGLE_EPSILON {}
+                // apply thrust
+            }
+            Self::CancelBadMomentumVector => {
+                let x = self.get_bad_mom(&momentum, &dest);
+                // apply thrust
+            }
+            Self::Turning => {
+                // figure out where to point....
+                let bad_mom_vector = self.get_bad_mom(&momentum, &dest);
+                if (-bad_mom_vector).angle_between(*momentum) < ANGLE_EPSILON {
+                    if current.angle_between(*dest) < ANGLE_EPSILON {
+                        *self = Self::FlyTo;
+                    }
+                // fallthrough - still turning
+                } else {
+                    *self = Self::CancelBadMomentumVector;
+                }
+            }
+        }
+    }
 
+    fn apply_thrust() {}
+    fn apply_momentum() {}
+    fn distance_to(&self, a: &Vec3, b: &Vec3) -> f32 {
+        (a.length() - b.length()).abs()
+    }
+    fn get_bad_mom(&self, momentum: &Vec3, dest: &Vec3) -> Vec3 {
+        // momentum.length() - dest.length()
+        *momentum - *dest
+    }
+}
 fn movement(
-    mut query: Query<(&mut Momentum, &mut Destination, &mut Transform)>,
+    mut query: Query<(
+        &mut Momentum,
+        &mut Destination,
+        &mut Transform,
+        &mut MoveLogic,
+    )>,
     mut sector_query: Query<(&Transform, &mut Sector)>,
 ) {
-    for (mut momentum, mut destination, mut transform) in &mut query.iter() {
+    for (mut momentum, mut destination, mut transform, mut move_logic) in &mut query.iter() {
         let dist = momentum.distance(&transform.translation(), &destination.d);
-        // println!("{}", dist);
+        println!("{}", dist);
 
-        if dist < 1000.0 {
+        if dist < 10.0 {
             destination.d = sector_query
                 .iter()
                 .iter()
@@ -133,10 +192,17 @@ fn movement(
 
         let facing = (transform.rotation().mul_vec3(Vec3::unit_y())).normalize();
         let vector_to_dest = (destination.d - pos).normalize();
+        let mut bad_vec = vector_to_dest - momentum.inertia.extend(0.00001).normalize();
+        if bad_vec.length() < momentum.thrust * 2.0 {
+            bad_vec = vector_to_dest
+        }
+        // print!("{} {}", bad_vec, bad_vec * momentum.inertia.extend(0.00001));
 
-        let (axis, angle) = momentum.turn_to(facing, vector_to_dest);
+        let (axis, angle) = momentum.turn_to(facing, bad_vec);
         let s = (momentum.max_rotation() / angle).abs();
-        let look_at = Quat::default_to_vec3(vector_to_dest);
+        // println!("{}", s);
+
+        let look_at = Quat::default_to_vec3(bad_vec);
 
         let rot = transform.rotation().normalize();
 
