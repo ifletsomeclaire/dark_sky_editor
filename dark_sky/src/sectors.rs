@@ -167,7 +167,7 @@ fn movement(
 ) {
     for (mut momentum, mut destination, mut transform, mut move_logic) in &mut query.iter() {
         let dist = momentum.distance(&transform.translation(), &destination.d);
-        println!("{}", dist);
+        print!("{}", dist);
 
         if dist < 10.0 {
             destination.d = sector_query
@@ -196,11 +196,11 @@ fn movement(
         if bad_vec.length() < momentum.thrust * 2.0 {
             bad_vec = vector_to_dest
         }
-        // print!("{} {}", bad_vec, bad_vec * momentum.inertia.extend(0.00001));
+        // print!(" {} {}", bad_vec, bad_vec * momentum.inertia.extend(0.00001));
 
         let (axis, angle) = momentum.turn_to(facing, bad_vec);
         let s = (momentum.max_rotation() / angle).abs();
-        // println!("{}", s);
+        println!(" maxrot: {} angle: {} s: {} min: {}",momentum.max_rotation(), angle, s, s.min(1.0));
 
         let look_at = Quat::default_to_vec3(bad_vec);
 

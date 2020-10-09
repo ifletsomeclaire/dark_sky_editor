@@ -59,10 +59,10 @@ pub trait EquationsOfMotion {
         let angle = current.angle_between(dest);
         let max = self.max_rotation();
         let cross = current.cross(dest).normalize();
-        if angle.abs() < max {
+        // if angle.abs() < max {
             (cross, angle)
-        } else {
-            (cross, max)
-        }
+        // } else {
+        //     (cross, max)
+        // }
     }
 }
