@@ -196,11 +196,18 @@ fn movement(
         if bad_vec.length() < momentum.thrust * 2.0 {
             bad_vec = vector_to_dest
         }
+        // let new_vec: Vector3D<f32, euclid::UnknownUnit> = EuclidFrom::from(bad_vec);
         // print!(" {} {}", bad_vec, bad_vec * momentum.inertia.extend(0.00001));
 
         let (axis, angle) = momentum.turn_to(facing, bad_vec);
         let s = (momentum.max_rotation() / angle).abs();
-        println!(" maxrot: {} angle: {} s: {} min: {}",momentum.max_rotation(), angle, s, s.min(1.0));
+        println!(
+            " maxrot: {} angle: {} s: {} min: {}",
+            momentum.max_rotation(),
+            angle,
+            s,
+            s.min(1.0)
+        );
 
         let look_at = Quat::default_to_vec3(bad_vec);
 
@@ -247,6 +254,10 @@ fn movement(
     }
 }
 
+fn GlamVec3(bad_vec: Vec3) {
+    todo!()
+}
+
 trait QuatMath {
     fn from_to_vec3(from: Vec3, to: Vec3) -> Quat;
     fn default_to_vec3(to: Vec3) -> Quat;
@@ -274,3 +285,4 @@ impl QuatMath for Quat {
         Quat::from_to_vec3(Vec3::unit_y(), forward)
     }
 }
+

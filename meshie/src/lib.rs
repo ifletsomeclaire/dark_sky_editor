@@ -1,4 +1,6 @@
-use bevy::{math::Vec3, prelude::Mesh, render::mesh::Indices};
+use std::ops::Range;
+
+use bevy::{math::Quat, math::Vec3, prelude::Mesh, render::mesh::Indices};
 
 pub mod generator;
 
@@ -17,7 +19,7 @@ pub fn reverse_triangles(mesh: &mut Mesh) {
     }
 }
 
-pub fn add_mesh(mesh: &mut Mesh, other: &Mesh) {
+pub fn add_mesh(mesh: &mut Mesh, other: &Mesh) -> Range<usize> {
     if let Some(indices) = mesh.indices.as_mut() {
         match indices {
             Indices::U16(_) => {}
@@ -36,10 +38,12 @@ pub fn add_mesh(mesh: &mut Mesh, other: &Mesh) {
             }
         }
     }
+    let mut result = Range::default();
     match mesh.attributes[0].values {
         bevy::render::mesh::VertexAttributeValues::Float3(ref mut values) => {
             match other.attributes[0].values {
                 bevy::render::mesh::VertexAttributeValues::Float3(ref addons) => {
+                    result = values.len()..values.len() + addons.len();
                     add_positions(values, addons);
                 }
                 _ => {}
@@ -69,6 +73,7 @@ pub fn add_mesh(mesh: &mut Mesh, other: &Mesh) {
         }
         _ => {}
     }
+    result
 }
 
 fn add_indices(mesh: &mut Vec<u32>, other: &Vec<u32>, count: usize) {
@@ -96,6 +101,32 @@ pub fn translate_mesh(mesh: &mut Mesh, position: Vec3) {
         _ => {}
     }
 }
+pub fn rotate_mesh(mesh: &mut Mesh, vertices: Range<usize>, rotation: Quat) {
+    let center = get_center(&mesh, vertices.clone()); // because Range isn't fucking Copy...... TODO: make our own RANGE
+    match mesh.attributes[0].values {
+        bevy::render::mesh::VertexAttributeValues::Float3(ref mut values) => {
+            for i in vertices {
+                let new_pos = rotation.mul_vec3(Vec3::from_slice_unaligned(&values[i]) - center) + center;
+                values[i] = [new_pos.x(), new_pos.y(), new_pos.z()];
+            }
+        }
+        _ => {}
+    }
+}
+pub fn get_center(mesh: &Mesh, vertices: Range<usize>) -> Vec3 {
+    match mesh.attributes[0].values {
+        bevy::render::mesh::VertexAttributeValues::Float3(ref values) => {
+            let mut average = Vec3::default();
+            for i in vertices.clone() { // AGAIN??????????
+                average += Vec3::from_slice_unaligned(&values[i]);
+            }
+            average /= vertices.len() as f32;
+            average
+        }
+        _ => {panic!("Vertices are in the wrong order")}
+    }
+}
+
 
 // pub fn remove(&mut Mesh, indices)
 

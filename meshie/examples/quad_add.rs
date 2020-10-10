@@ -1,10 +1,12 @@
+use std::ops::Range;
+
 use bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin, PrintDiagnosticsPlugin},
     math::vec2,
     math::vec3,
     prelude::*,
 };
-use meshie::{add_mesh, reverse_triangles, translate_mesh};
+use meshie::{add_mesh, reverse_triangles, rotate_mesh, translate_mesh};
 
 fn main() {
     App::build()
@@ -12,6 +14,7 @@ fn main() {
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(PrintDiagnosticsPlugin::default())
         .add_startup_system(setup.system())
+        .add_system(rotate_me_baby_one_more_time.system())
         .run();
 }
 
@@ -42,19 +45,42 @@ fn setup(
         flip: false,
     });
     translate_mesh(&mut mesh_two, vec3(10., 0.0, -5.0));
-    add_mesh(&mut mesh, &mesh_two);
+    let indices = add_mesh(&mut mesh, &mesh_two);
+
+    println!("{:?}", indices);
     // reverse_triangles(&mut mesh);
     let cube_handle = meshes.add(mesh);
-    commands.spawn(PbrComponents {
-        mesh: cube_handle,
-        material: materials.add(StandardMaterial {
+    commands
+        .spawn(PbrComponents {
+            mesh: cube_handle,
+            material: materials.add(StandardMaterial {
+                ..Default::default()
+            }),
+            transform: Transform::from_translation(Vec3::new(
+                20.0,
+                20.0,
+                0.0,
+            )),
             ..Default::default()
-        }),
-        // transform: Transform::from_translation(Vec3::new(
-        //     rng.gen_range(-50.0, 50.0),
-        //     rng.gen_range(-50.0, 50.0),
-        //     0.0,
-        // )),
-        ..Default::default()
-    });
+        })
+        .with(MeshIndices {
+            handle: cube_handle,
+            range: indices,
+        });
+}
+
+struct MeshIndices {
+    handle: Handle<Mesh>,
+    range: Range<usize>,
+}
+
+fn rotate_me_baby_one_more_time(mut meshes: ResMut<Assets<Mesh>>, mut query: Query<&MeshIndices>) {
+    for meshindy in &mut query.iter() {
+        if let Some(mesh) = meshes.get_mut(&meshindy.handle) {
+            let quat = Quat::from_rotation_z(0.1);
+            rotate_mesh(mesh, meshindy.range.clone(), quat); //AAAAAAHHHHHHAHAAAHAHAHHHHHHHHHHHHHH x.x
+
+        }
+
+    }
 }
