@@ -45,14 +45,7 @@ impl MeshBuilder {
                             ),
                             flip: false,
                         });
-                        translate_mesh(
-                            &mut new_mesh,
-                            vec3(
-                                rng.gen_range(-config.area.x(), config.area.x()),
-                                rng.gen_range(-config.area.y(), config.area.y()),
-                                rng.gen_range(0., config.area.z()) + z_value,
-                            ),
-                        );
+                        
                         // update uvs
                         match new_mesh.attributes[2].values {
                             bevy::render::mesh::VertexAttributeValues::Float2(ref mut values) => {
@@ -73,7 +66,15 @@ impl MeshBuilder {
                             }
                             _ => {}
                         }
-                        add_mesh(&mut mesh, &new_mesh);
+                        let verts = add_mesh(&mut mesh, &new_mesh);
+                        translate_mesh(
+                            &mut mesh, verts,
+                            vec3(
+                                rng.gen_range(-config.area.x(), config.area.x()),
+                                rng.gen_range(-config.area.y(), config.area.y()),
+                                rng.gen_range(0., config.area.z()) + z_value,
+                            ),
+                        );
                     }
                 }
             }

@@ -41,9 +41,10 @@ fn sector_init(
             subdivisions: 2,
         });
 
-        meshie::translate_mesh(&mut other, Vec3::new(x, y, z));
         // return the indicies added
-        meshie::add_mesh(&mut mesh, &other);
+        let verts = meshie::add_mesh(&mut mesh, &other);
+        meshie::translate_mesh(&mut mesh, verts, Vec3::new(x, y, z));
+
     }
 
     let meshie_handle = meshes.add(mesh);

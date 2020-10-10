@@ -1,4 +1,4 @@
-use std::ops::Range;
+use ds_range::Range;
 
 use bevy::{math::Quat, math::Vec3, prelude::Mesh, render::mesh::Indices};
 
@@ -19,8 +19,8 @@ pub fn reverse_triangles(mesh: &mut Mesh) {
     }
 }
 
-pub fn add_mesh(mesh: &mut Mesh, other: &Mesh) -> Range<usize> {
-    let mut result: Range<usize> = Range::default();
+pub fn add_mesh(mesh: &mut Mesh, other: &Mesh) -> Range {
+    let mut result: Range = Range::default();
     if let Some(indices) = mesh.indices.as_mut() {
         match indices {
             Indices::U16(_) => {}
@@ -43,10 +43,11 @@ pub fn add_mesh(mesh: &mut Mesh, other: &Mesh) -> Range<usize> {
         bevy::render::mesh::VertexAttributeValues::Float3(ref mut values) => {
             match other.attributes[0].values {
                 bevy::render::mesh::VertexAttributeValues::Float3(ref addons) => {
-                    result = values.len()..values.len() + addons.len();
+                    result.start = values.len();
+                    result.end = values.len() + addons.len();
                     add_positions(values, addons);
                 }
-                _ => {panic!(" no positions on mesh")}
+                _ => panic!(" no positions on mesh"),
             }
         }
         _ => {}
@@ -89,23 +90,23 @@ fn add_uvs(mesh: &mut Vec<[f32; 2]>, other: &Vec<[f32; 2]>) {
     mesh.extend(other)
 }
 
-pub fn translate_mesh(mesh: &mut Mesh, position: Vec3) {
+pub fn translate_mesh(mesh: &mut Mesh, vertices: ds_range::Range, translation: Vec3) {
     match mesh.attributes[0].values {
         bevy::render::mesh::VertexAttributeValues::Float3(ref mut values) => {
-            for value in values {
-                value[0] = value[0] + position.x();
-                value[1] = value[1] + position.y();
-                value[2] = value[2] + position.z();
+            for i in vertices.iter() {
+                values[i][0] = values[i][0] + translation.x();
+                values[i][1] = values[i][1] + translation.y();
+                values[i][2] = values[i][2] + translation.z();
             }
         }
         _ => {}
     }
 }
-pub fn rotate_mesh(mesh: &mut Mesh, vertices: Range<usize>, rotation: Quat) {
-    let center = get_center(&mesh, vertices.clone()); // because Range isn't fucking Copy...... TODO: make our own RANGE
+pub fn rotate_mesh(mesh: &mut Mesh, vertices: ds_range::Range, rotation: Quat) {
+    let center = get_center(&mesh, vertices);
     match mesh.attributes[0].values {
         bevy::render::mesh::VertexAttributeValues::Float3(ref mut values) => {
-            for i in vertices {
+            for i in vertices.iter() {
                 let new_pos =
                     rotation.mul_vec3(Vec3::from_slice_unaligned(&values[i]) - center) + center;
                 values[i] = [new_pos.x(), new_pos.y(), new_pos.z()];
@@ -114,18 +115,32 @@ pub fn rotate_mesh(mesh: &mut Mesh, vertices: Range<usize>, rotation: Quat) {
         _ => {}
     }
 }
-pub fn get_center(mesh: &Mesh, vertices: Range<usize>) -> Vec3 {
+pub fn get_center(mesh: &Mesh, vertices: ds_range::Range) -> Vec3 {
     match mesh.attributes[0].values {
         bevy::render::mesh::VertexAttributeValues::Float3(ref values) => {
             let mut average = Vec3::default();
-            for i in vertices.clone() {
-                // AGAIN??????????
+            for i in vertices.iter() {
                 average += Vec3::from_slice_unaligned(&values[i]);
             }
             average /= vertices.len() as f32;
             average
         }
         _ => panic!("Vertices are in the wrong order"),
+    }
+}
+pub fn extend_mesh(mesh: &mut Mesh, vertices: ds_range::Range, direction: Vec3) {
+    let center = get_center(&mesh, vertices);
+    match mesh.attributes[0].values {
+        bevy::render::mesh::VertexAttributeValues::Float3(ref mut values) => {
+            for i in vertices.iter() {
+                let vert = Vec3::from_slice_unaligned(&values[i]);
+                if direction.dot(vert - center) > 0.0 {
+                    let new_pos = vert + direction;
+                    values[i] = [new_pos.x(), new_pos.y(), new_pos.z()];
+                }
+            }
+        }
+        _ => {}
     }
 }
 

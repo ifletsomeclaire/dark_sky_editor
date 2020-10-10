@@ -66,8 +66,9 @@ fn start(
         flip: false,
         size: Vec2::new(1000., 1000.),
     });
-    meshie::translate_mesh(&mut cube_mesh, Vec3::new(1200., 0.0, 0.0));
-    meshie::add_mesh(&mut cube_mesh, &other);
+    let verts = meshie::add_mesh(&mut cube_mesh, &other);
+    meshie::translate_mesh(&mut cube_mesh, verts, Vec3::new(1200., 0.0, 0.0));
+
     let cube_handle = meshes.add(cube_mesh);
     let ray_ball_handle = meshes.add(ray_ball);
 

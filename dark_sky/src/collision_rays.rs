@@ -42,8 +42,9 @@ fn start(
             rng.gen_range(-205.0, 205.0),
             rng.gen_range(-205.0, 205.0),
         );
-        translate_mesh(&mut mesh, position);
-        add_mesh(&mut meshie, &mesh);
+        let verts = add_mesh(&mut meshie, &mesh);
+        translate_mesh(&mut meshie, verts, position);
+
         cubeships.push(CubeShip {
             position,
             radius: 50.,

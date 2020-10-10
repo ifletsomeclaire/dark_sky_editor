@@ -1,7 +1,7 @@
 #[derive(Debug, Copy, Clone, Default, Ord, PartialOrd, Eq, PartialEq)]
 pub struct Range {
-    pub start: u32,
-    pub end: u32,
+    pub start: usize,
+    pub end: usize,
 }
 impl std::ops::Add for Range {
     type Output = Self;
@@ -22,23 +22,26 @@ impl std::ops::Add for Range {
     }
 }
 impl Range {
-    pub fn iter(&self) -> std::ops::Range<u32> {
+    pub fn iter(&self) -> std::ops::Range<usize> {
         std::ops::Range {
             start: self.start,
             end: self.end,
         }
     }
+    pub fn len(&self) -> usize {
+        self.end - self.start
+    }
 }
 
-impl From<std::ops::Range<u32>> for Range {
-    fn from(r: std::ops::Range<u32>) -> Self {
+impl From<std::ops::Range<usize>> for Range {
+    fn from(r: std::ops::Range<usize>) -> Self {
         Self {
             start: r.start,
             end: r.end,
         }
     }
 }
-impl From<Range> for std::ops::Range<u32> {
+impl From<Range> for std::ops::Range<usize> {
     fn from(r: Range) -> Self {
         Self {
             start: r.start,
@@ -54,7 +57,7 @@ mod tests {
     fn it_works() {
         let s = Range { start: 10, end: 20 };
         let o = Range { start: 20, end: 26 };
-        // let y: std::ops::Range<u32> = o.into();
+        // let y: std::ops::Range<usize> = o.into();
         // let z: Range = y.into();
 
         let x = s + o;

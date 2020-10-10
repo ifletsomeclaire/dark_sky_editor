@@ -1,12 +1,10 @@
-use std::ops::Range;
-
 use bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin, PrintDiagnosticsPlugin},
     math::vec2,
     math::vec3,
     prelude::*,
 };
-use meshie::{add_mesh, reverse_triangles, rotate_mesh, translate_mesh};
+
 
 fn main() {
     App::build()
@@ -40,12 +38,12 @@ fn setup(
         });
 
     let mut mesh = Mesh::from(shape::Cube { size: 10.0 });
-    let mut mesh_two = Mesh::from(shape::Quad {
+    let mesh_two = Mesh::from(shape::Quad {
         size: vec2(100., 100.),
         flip: false,
     });
-    translate_mesh(&mut mesh_two, vec3(10., 0.0, -5.0));
-    let indices = add_mesh(&mut mesh, &mesh_two);
+    let indices = meshie::add_mesh(&mut mesh, &mesh_two);
+    meshie::translate_mesh(&mut mesh, indices, vec3(10., 0.0, -5.0));
 
     println!("{:?}", indices);
     // reverse_triangles(&mut mesh);
@@ -71,15 +69,16 @@ fn setup(
 
 struct MeshIndices {
     handle: Handle<Mesh>,
-    range: Range<usize>,
+    range: ds_range::Range,
 }
 
 fn rotate_me_baby_one_more_time(mut meshes: ResMut<Assets<Mesh>>, mut query: Query<&MeshIndices>) {
     for meshindy in &mut query.iter() {
         if let Some(mesh) = meshes.get_mut(&meshindy.handle) {
-            let quat = Quat::from_rotation_z(0.1);
-            rotate_mesh(mesh, meshindy.range.clone(), quat); //AAAAAAHHHHHHAHAAAHAHAHHHHHHHHHHHHHH x.x
-
+            let quat = Quat::from_rotation_z(0.01);
+            meshie::rotate_mesh(mesh, meshindy.range, quat);
+            meshie::extend_mesh(mesh, meshindy.range, vec3(-0.1, 0.0, 0.0));
+            meshie::translate_mesh(mesh, meshindy.range, vec3(0.0, -0.2, 0.0))
         }
 
     }
