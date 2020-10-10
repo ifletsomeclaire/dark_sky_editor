@@ -2,8 +2,8 @@ use bevy::{
     math::*,
     prelude::*,
     render::camera::Camera,
-    render::mesh::VertexAttribute,
-    render::mesh::VertexAttributeValues,
+    // render::mesh::VertexAttribute,
+    // render::mesh::VertexAttributeValues,
     window::{CursorMoved, WindowId},
 };
 use meshie::Meshie;

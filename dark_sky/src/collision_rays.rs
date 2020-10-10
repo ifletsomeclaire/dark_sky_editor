@@ -36,7 +36,7 @@ fn start(
     }];
 
     for _ in 0..10 {
-        let mut mesh = Mesh::from(shape::Cube { size: 100.0 });
+        let mesh = Mesh::from(shape::Cube { size: 100.0 });
         let position = vec3(
             rng.gen_range(-205.0, 205.0),
             rng.gen_range(-205.0, 205.0),

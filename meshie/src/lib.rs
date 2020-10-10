@@ -1,6 +1,6 @@
 use ds_range::Range;
 
-use bevy::{math::Quat, math::Vec3, prelude::Mesh, render::mesh::Indices};
+use bevy::{math::Quat, math::Vec2, math::Vec3, prelude::Mesh, render::mesh::Indices};
 
 pub mod generator;
 
@@ -9,8 +9,12 @@ pub trait Meshie {
     fn add_mesh(&mut self, other: &Self) -> Range;
     fn translate_mesh(&mut self, vertices: ds_range::Range, translation: Vec3);
     fn rotate_mesh(&mut self, vertices: ds_range::Range, rotation: Quat);
+    fn rotate_from_meshie_center(&mut self, vertices: ds_range::Range, rotation: Quat);
     fn get_center(&self, vertices: ds_range::Range) -> Vec3;
     fn extend_mesh(&mut self, vertices: ds_range::Range, direction: Vec3);
+    fn set_uvs(&mut self, uv: Vec2);
+    fn get_positions(&self, vertices: ds_range::Range) -> Vec<[f32; 3]>;
+    fn set_positions(&mut self, vertices: ds_range::Range, positions: Vec<[f32; 3]>);
 }
 
 impl Meshie for Mesh {
@@ -33,12 +37,14 @@ impl Meshie for Mesh {
         if let Some(indices) = self.indices.as_mut() {
             match indices {
                 Indices::U16(_) => {}
-                Indices::U32(ref mut values) => match other.indices.as_ref().expect("other indices") {
-                    Indices::U16(_) => {}
-                    Indices::U32(ref addons) => {
-                        add_indices(values, addons, self.attributes[0].values.len());
+                Indices::U32(ref mut values) => {
+                    match other.indices.as_ref().expect("other indices") {
+                        Indices::U16(_) => {}
+                        Indices::U32(ref addons) => {
+                            add_indices(values, addons, self.attributes[0].values.len());
+                        }
                     }
-                },
+                }
             }
         } else {
             match other.indices.as_ref().expect("other indices") {
@@ -85,7 +91,7 @@ impl Meshie for Mesh {
         }
         result
     }
-    
+
     fn translate_mesh(&mut self, vertices: ds_range::Range, translation: Vec3) {
         match self.attributes[0].values {
             bevy::render::mesh::VertexAttributeValues::Float3(ref mut values) => {
@@ -105,6 +111,18 @@ impl Meshie for Mesh {
                 for i in vertices.iter() {
                     let new_pos =
                         rotation.mul_vec3(Vec3::from_slice_unaligned(&values[i]) - center) + center;
+                    values[i] = [new_pos.x(), new_pos.y(), new_pos.z()];
+                }
+            }
+            _ => {}
+        }
+    }
+    fn rotate_from_meshie_center(&mut self, vertices: ds_range::Range, rotation: Quat) {
+        // let center = self.get_center(vertices);
+        match self.attributes[0].values {
+            bevy::render::mesh::VertexAttributeValues::Float3(ref mut values) => {
+                for i in vertices.iter() {
+                    let new_pos = rotation.mul_vec3(Vec3::from_slice_unaligned(&values[i]));
                     values[i] = [new_pos.x(), new_pos.y(), new_pos.z()];
                 }
             }
@@ -139,10 +157,42 @@ impl Meshie for Mesh {
             _ => {}
         }
     }
-    
+    fn set_uvs(&mut self, uv: Vec2) {
+        match self.attributes[2].values {
+            bevy::render::mesh::VertexAttributeValues::Float2(ref mut values) => {
+                for value in values {
+                    value[0] = uv.x();
+                    value[1] = uv.y();
+                }
+            }
+            _ => {}
+        }
+    }
+
+    fn get_positions(&self, vertices: Range) -> Vec<[f32; 3]> {
+        match self.attributes[0].values {
+            bevy::render::mesh::VertexAttributeValues::Float3(ref values) => {
+                let mut result = Vec::new();
+                for i in vertices.iter() {
+                    result.push(values[i]);
+                }
+                result
+            }
+            _ => panic!("no positions on mesh??"),
+        }
+    }
+
+    fn set_positions(&mut self, vertices: Range, positions: Vec<[f32; 3]>) {
+        match self.attributes[0].values {
+            bevy::render::mesh::VertexAttributeValues::Float3(ref mut values) => {
+                for i in vertices.iter() {
+                    values[i] = positions[i - vertices.start];
+                }
+            }
+            _ => panic!("no positions on mesh??"),
+        }
+    }
 }
-
-
 
 fn add_indices(mesh: &mut Vec<u32>, other: &Vec<u32>, count: usize) {
     mesh.extend(other.iter().map(|o| *o + count as u32))
@@ -156,7 +206,6 @@ fn add_normals(mesh: &mut Vec<[f32; 3]>, other: &Vec<[f32; 3]>) {
 fn add_uvs(mesh: &mut Vec<[f32; 2]>, other: &Vec<[f32; 2]>) {
     mesh.extend(other)
 }
-
 
 // pub fn remove(&mut Mesh, indices)
 

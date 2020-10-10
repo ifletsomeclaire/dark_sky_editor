@@ -37,7 +37,7 @@ fn sector_init(
         let z = rng.gen_range(0.0, 1.0);
         trans.translate(Vec3::new(x, y, z));
         vec_to_spawn.push((trans, Sector::default()));
-        let mut other = Mesh::from(shape::Icosphere {
+        let other = Mesh::from(shape::Icosphere {
             radius: 100.0,
             subdivisions: 2,
         });
@@ -201,7 +201,7 @@ fn movement(
         // let new_vec: Vector3D<f32, euclid::UnknownUnit> = EuclidFrom::from(bad_vec);
         // print!(" {} {}", bad_vec, bad_vec * momentum.inertia.extend(0.00001));
 
-        let (axis, angle) = momentum.turn_to(facing, bad_vec);
+        let (_axis, angle) = momentum.turn_to(facing, bad_vec);
         let s = (momentum.max_rotation() / angle).abs();
         println!(
             " maxrot: {} angle: {} s: {} min: {}",
@@ -256,9 +256,6 @@ fn movement(
     }
 }
 
-fn GlamVec3(bad_vec: Vec3) {
-    todo!()
-}
 
 trait QuatMath {
     fn from_to_vec3(from: Vec3, to: Vec3) -> Quat;

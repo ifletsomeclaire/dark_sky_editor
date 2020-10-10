@@ -1,6 +1,6 @@
 use bevy::{
     math::{vec2, vec3, Vec2, Vec3},
-    prelude::{shape, Handle, Mesh, Texture},
+    prelude::*,
     sprite::Rect,
 };
 use rand::Rng;

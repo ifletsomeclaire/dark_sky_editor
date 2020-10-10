@@ -21,6 +21,7 @@ mod motion_test;
 mod player_ship;
 mod sectors;
 mod starmap;
+mod movement_debug;
 
 fn main() {
     App::build()
@@ -33,7 +34,8 @@ fn main() {
         .add_plugin(Main3dCamera)
         .add_plugin(DarkSkyComponentRegistry)
         .add_plugin(StarMap)
-        .add_plugin(Sectors)
+        .add_plugin(movement_debug::MovementDebug)
+        // .add_plugin(Sectors)
         // .add_plugin(PlayerShip)
         // .add_plugin(MeshieShipTest)
         // .add_plugin(MotionTest)

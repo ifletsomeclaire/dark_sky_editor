@@ -1,6 +1,6 @@
 use bevy::{math::vec2, prelude::*};
 
-use crate::equations_of_motion::{Destination, EquationsOfMotion, Momentum};
+use crate::equations_of_motion::{Destination, EquationsOfMotion, Momentum, QuatMath};
 pub struct MotionTest;
 
 impl Plugin for MotionTest {
@@ -48,7 +48,7 @@ fn movement(mut query: Query<(&mut Momentum, &Destination, &mut Transform)>) {
         let facing = (transform.rotation().mul_vec3(Vec3::unit_y())).normalize();
         let vector_to_dest = (destination.d - pos).normalize();
 
-        let (axis, angle) = momentum.turn_to(facing, vector_to_dest);
+        let (_axis, angle) = momentum.turn_to(facing, vector_to_dest);
         let s = (momentum.max_rotation() / angle).abs();
         let look_at = Quat::default_to_vec3(vector_to_dest);
 
@@ -95,30 +95,3 @@ fn movement(mut query: Query<(&mut Momentum, &Destination, &mut Transform)>) {
     }
 }
 
-trait QuatMath {
-    fn from_to_vec3(from: Vec3, to: Vec3) -> Quat;
-    fn default_to_vec3(to: Vec3) -> Quat;
-}
-
-impl QuatMath for Quat {
-    fn from_to_vec3(from: Vec3, to: Vec3) -> Quat {
-        let from_vec = from.normalize();
-        let to_vec = to.normalize();
-        let dot = from_vec.dot(to_vec);
-        if dot >= 1.0 {
-            return Quat::identity();
-        }
-        if dot < 1e-6_f32 - 1.0 {
-            let mut axis = Vec3::unit_x().cross(from);
-            if axis.length() == 0.0 {
-                axis = Vec3::unit_y().cross(from);
-            }
-            return Quat::from_axis_angle(axis.normalize(), std::f32::consts::PI);
-        }
-        let angle = dot.acos();
-        Quat::from_axis_angle(from_vec.cross(to_vec).normalize(), angle).normalize()
-    }
-    fn default_to_vec3(forward: Vec3) -> Quat {
-        Quat::from_to_vec3(Vec3::unit_y(), forward)
-    }
-}
