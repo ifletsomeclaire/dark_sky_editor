@@ -1,5 +1,6 @@
 use bevy::math::*;
 use bevy::prelude::*;
+use meshie::Meshie;
 use rand::Rng;
 
 use crate::equations_of_motion::{Destination, EquationsOfMotion, Momentum};
@@ -42,8 +43,8 @@ fn sector_init(
         });
 
         // return the indicies added
-        let verts = meshie::add_mesh(&mut mesh, &other);
-        meshie::translate_mesh(&mut mesh, verts, Vec3::new(x, y, z));
+        let verts = mesh.add_mesh(&other);
+        mesh.translate_mesh(verts, Vec3::new(x, y, z));
 
     }
 

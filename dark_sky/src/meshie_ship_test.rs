@@ -6,6 +6,7 @@ use bevy::{
     render::mesh::VertexAttributeValues,
     window::{CursorMoved, WindowId},
 };
+use meshie::Meshie;
 use rays::Ray3d;
 
 use crate::main_3d_camera::CameraMarker;
@@ -66,8 +67,8 @@ fn start(
         flip: false,
         size: Vec2::new(1000., 1000.),
     });
-    let verts = meshie::add_mesh(&mut cube_mesh, &other);
-    meshie::translate_mesh(&mut cube_mesh, verts, Vec3::new(1200., 0.0, 0.0));
+    let verts = cube_mesh.add_mesh(&other);
+    cube_mesh.translate_mesh(verts, Vec3::new(1200., 0.0, 0.0));
 
     let cube_handle = meshes.add(cube_mesh);
     let ray_ball_handle = meshes.add(ray_ball);

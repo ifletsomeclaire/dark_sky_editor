@@ -2,7 +2,7 @@ use bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin, PrintDiagnosticsPlugin},
     prelude::*,
 };
-use meshie::reverse_triangles;
+use meshie::Meshie;
 
 /// This example spawns a large number of cubes, each with its own changing position and material
 /// This is intended to be a stress test of bevy's ability to render many objects with different properties
@@ -53,7 +53,7 @@ fn setup(
         });
 
     let mut mesh = Mesh::from(shape::Cube { size: 60.0 });
-    reverse_triangles(&mut mesh);
+    mesh.reverse_triangles();
     let cube_handle = meshes.add(mesh);
     commands.spawn(PbrComponents {
         mesh: cube_handle,

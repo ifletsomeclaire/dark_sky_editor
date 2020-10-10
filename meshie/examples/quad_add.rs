@@ -4,6 +4,7 @@ use bevy::{
     math::vec3,
     prelude::*,
 };
+use meshie::Meshie;
 
 
 fn main() {
@@ -42,8 +43,8 @@ fn setup(
         size: vec2(100., 100.),
         flip: false,
     });
-    let indices = meshie::add_mesh(&mut mesh, &mesh_two);
-    meshie::translate_mesh(&mut mesh, indices, vec3(10., 0.0, -5.0));
+    let indices = mesh.add_mesh(&mesh_two);
+    mesh.translate_mesh(indices, vec3(10., 0.0, -5.0));
 
     println!("{:?}", indices);
     // reverse_triangles(&mut mesh);
@@ -76,9 +77,9 @@ fn rotate_me_baby_one_more_time(mut meshes: ResMut<Assets<Mesh>>, mut query: Que
     for meshindy in &mut query.iter() {
         if let Some(mesh) = meshes.get_mut(&meshindy.handle) {
             let quat = Quat::from_rotation_z(0.01);
-            meshie::rotate_mesh(mesh, meshindy.range, quat);
-            meshie::extend_mesh(mesh, meshindy.range, vec3(-0.1, 0.0, 0.0));
-            meshie::translate_mesh(mesh, meshindy.range, vec3(0.0, -0.2, 0.0))
+            mesh.rotate_mesh(meshindy.range, quat);
+            mesh.extend_mesh(meshindy.range, vec3(-0.1, 0.0, 0.0));
+            mesh.translate_mesh(meshindy.range, vec3(0.0, -0.2, 0.0))
         }
 
     }

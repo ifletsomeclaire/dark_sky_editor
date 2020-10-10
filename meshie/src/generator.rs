@@ -5,7 +5,7 @@ use bevy::{
 };
 use rand::Rng;
 
-use crate::{add_mesh, translate_mesh};
+use crate::Meshie;
 
 #[derive(Debug, Copy, Clone)]
 pub enum DistributionFn {
@@ -45,7 +45,7 @@ impl MeshBuilder {
                             ),
                             flip: false,
                         });
-                        
+
                         // update uvs
                         match new_mesh.attributes[2].values {
                             bevy::render::mesh::VertexAttributeValues::Float2(ref mut values) => {
@@ -66,9 +66,9 @@ impl MeshBuilder {
                             }
                             _ => {}
                         }
-                        let verts = add_mesh(&mut mesh, &new_mesh);
-                        translate_mesh(
-                            &mut mesh, verts,
+                        let verts = mesh.add_mesh(&new_mesh);
+                        mesh.translate_mesh(
+                            verts,
                             vec3(
                                 rng.gen_range(-config.area.x(), config.area.x()),
                                 rng.gen_range(-config.area.y(), config.area.y()),
