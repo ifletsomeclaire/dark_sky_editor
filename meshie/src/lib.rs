@@ -20,6 +20,7 @@ pub fn reverse_triangles(mesh: &mut Mesh) {
 }
 
 pub fn add_mesh(mesh: &mut Mesh, other: &Mesh) -> Range<usize> {
+    let mut result: Range<usize> = Range::default();
     if let Some(indices) = mesh.indices.as_mut() {
         match indices {
             Indices::U16(_) => {}
@@ -38,7 +39,6 @@ pub fn add_mesh(mesh: &mut Mesh, other: &Mesh) -> Range<usize> {
             }
         }
     }
-    let mut result = Range::default();
     match mesh.attributes[0].values {
         bevy::render::mesh::VertexAttributeValues::Float3(ref mut values) => {
             match other.attributes[0].values {
@@ -46,7 +46,7 @@ pub fn add_mesh(mesh: &mut Mesh, other: &Mesh) -> Range<usize> {
                     result = values.len()..values.len() + addons.len();
                     add_positions(values, addons);
                 }
-                _ => {}
+                _ => {panic!(" no positions on mesh")}
             }
         }
         _ => {}
@@ -106,7 +106,8 @@ pub fn rotate_mesh(mesh: &mut Mesh, vertices: Range<usize>, rotation: Quat) {
     match mesh.attributes[0].values {
         bevy::render::mesh::VertexAttributeValues::Float3(ref mut values) => {
             for i in vertices {
-                let new_pos = rotation.mul_vec3(Vec3::from_slice_unaligned(&values[i]) - center) + center;
+                let new_pos =
+                    rotation.mul_vec3(Vec3::from_slice_unaligned(&values[i]) - center) + center;
                 values[i] = [new_pos.x(), new_pos.y(), new_pos.z()];
             }
         }
@@ -117,20 +118,18 @@ pub fn get_center(mesh: &Mesh, vertices: Range<usize>) -> Vec3 {
     match mesh.attributes[0].values {
         bevy::render::mesh::VertexAttributeValues::Float3(ref values) => {
             let mut average = Vec3::default();
-            for i in vertices.clone() { // AGAIN??????????
+            for i in vertices.clone() {
+                // AGAIN??????????
                 average += Vec3::from_slice_unaligned(&values[i]);
             }
             average /= vertices.len() as f32;
             average
         }
-        _ => {panic!("Vertices are in the wrong order")}
+        _ => panic!("Vertices are in the wrong order"),
     }
 }
 
-
 // pub fn remove(&mut Mesh, indices)
-
-
 
 #[cfg(test)]
 mod tests {
