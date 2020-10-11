@@ -1,35 +1,17 @@
 use bevy::{math::*, prelude::*, render::pipeline::PrimitiveTopology};
+use ds_movement_debug::*;
 use meshie::Meshie;
 
 use crate::equations_of_motion::*;
 
 pub struct MovementDebug;
 
-#[derive(Default, Debug)]
-struct EffectsResource {
-    mesh_handle: Handle<Mesh>,
-    availability: Vec<Availability>,
-    vertices: Vec<ds_range::Range>,
-    chunk_size: u32,
-    max_chunks: u32,
-}
-#[derive(Debug, PartialEq)]
-enum Availability {
-    Open,
-    Used,
-}
-impl Default for Availability {
-    fn default() -> Self {
-        Self::Open
-    }
-}
-
 impl Plugin for MovementDebug {
     fn build(&self, app: &mut AppBuilder) {
         app.init_resource::<EffectsResource>()
             .add_startup_system(start.system())
             .add_system(movement.system())
-            .add_system(debug.system())
+            .add_system(dotted_path.system())
             .add_system(move_meshie.system())
             .add_system(update_meshie_momentum.system());
     }
@@ -163,7 +145,7 @@ fn movement(
     }
 }
 
-fn debug(
+fn dotted_path(
     // mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut effects: ResMut<EffectsResource>,
@@ -195,15 +177,12 @@ fn update_meshie_momentum(
     mom_query: Query<&Momentum>,
     tran_query: Query<&Transform>,
 ) {
-    println!("I am running....");
     for mut debug in &mut query.iter() {
         let debug_meshie = meshes
             .get_mut(&debug.mesh_handle)
             .expect("I expected to get a debug mesh");
-        let momentum: Ref<Momentum> = mom_query.get(debug.entity).expect("getting transform");
+        let momentum: Ref<Momentum> = mom_query.get(debug.entity).expect("getting momentum");
         let transform: Ref<Transform> = tran_query.get(debug.entity).expect("getting transform");
-        let rot = transform.rotation();
-        println!("{:?}", momentum);
         debug_meshie.set_positions(debug.momentum, debug.momentum_pos.clone());
         debug_meshie.rotate_from_meshie_center(
             debug.momentum,
@@ -223,71 +202,3 @@ fn move_meshie(mut query: Query<(&mut Transform, &DebugMeshie)>, ship_query: Que
     }
 }
 
-pub struct DebugMeshie {
-    entity: Entity,
-    mesh_handle: Handle<Mesh>,
-    momentum: ds_range::Range,
-    momentum_pos: Vec<[f32; 3]>,
-    // facing: ds_range::Range,
-    last_path: Vec3,
-    prior_inertia: Vec3,
-}
-
-pub fn generate_debug_meshie(entity: Entity, meshes: &mut ResMut<Assets<Mesh>>) -> DebugMeshie {
-    let mut meshie = Mesh::from(shape::Quad {
-        size: vec2(10.0, 200.0),
-        flip: false,
-    });
-    meshie.translate_mesh(ds_range::Range { start: 0, end: 3 }, vec3(0.0, 190.0, 0.0));
-    let momentum = meshie.add_mesh(&Mesh::from(shape::Quad {
-        size: vec2(10.0, 200.0),
-        flip: false,
-    }));
-    meshie.translate_mesh(momentum, vec3(0.0, 290.0, 0.0));
-    let positions = meshie.get_positions(momentum);
-
-    DebugMeshie {
-        entity,
-        mesh_handle: meshes.add(meshie),
-        momentum,
-        momentum_pos: positions,
-        // facing: ds_range::Range { start: 0, end: 3},
-        last_path: Vec3::default(),
-        prior_inertia: Vec3::default(),
-    }
-}
-
-struct EntityDestination {
-    target: Entity,
-}
-struct EffectsMeshie;
-#[derive(Default, Debug)]
-struct Effect {
-    indices: ds_range::Range,
-}
-
-fn generate_effects_meshie(
-    chunk_size: u32,
-    max_chunks: u32,
-    effects: &mut ResMut<EffectsResource>,
-) -> Mesh {
-    effects.chunk_size = chunk_size;
-    effects.max_chunks = max_chunks;
-
-    let mut effects_meshie = Mesh::from(shape::Quad {
-        size: vec2(80.0, 80.0),
-        flip: false,
-    });
-    effects.vertices.push(ds_range::Range { start: 0, end: 3 });
-    effects.availability.push(Availability::Used);
-
-    for _ in 0..(max_chunks - 1) {
-        let mesh = Mesh::from(shape::Quad {
-            size: vec2(80.0, 80.0),
-            flip: false,
-        });
-        effects.vertices.push(effects_meshie.add_mesh(&mesh));
-        effects.availability.push(Availability::Open);
-    }
-    effects_meshie
-}

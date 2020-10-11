@@ -1,3 +1,3 @@
 [workspace]
 
-members = ["main", "skybox", "mega_mesh", "meshie", "dark_sky", "tools/image_tools/interpolate", "ds_range"]
+members = ["main", "skybox", "mega_mesh", "meshie", "dark_sky", "tools/image_tools/interpolate", "ds_range", "ds_movement_debug"]
