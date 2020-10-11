@@ -130,6 +130,7 @@ fn start(
         basecolor: Color::rgb(1.0, 1.0, 0.0),
         texture: None,
     });
+    
     let _debug = commands
         .spawn(MeshComponents {
             mesh: debug_meshie.mesh_handle,

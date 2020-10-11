@@ -40,10 +40,12 @@ pub fn generate_debug_meshie(entity: Entity, meshes: &mut ResMut<Assets<Mesh>>) 
         flip: false,
     });
     meshie.translate_mesh(ds_range::Range { start: 0, end: 3 }, vec3(0.0, 190.0, 0.0));
+    meshie.set_uvs(ds_range::Range { start: 0, end: 3 }, vec![[0.5, 0.0], [0.5, 0.0], [0.5, 0.0], [0.5, 0.0]]);
     let momentum = meshie.add_mesh(&Mesh::from(shape::Quad {
         size: vec2(10.0, 200.0),
         flip: false,
     }));
+    meshie.set_uvs(momentum, vec![[0.0,0.5], [0.0,0.5], [0.0,0.5], [0.0,0.5]]);
     meshie.translate_mesh(momentum, vec3(0.0, 290.0, 0.0));
     let positions = meshie.get_positions(momentum);
 
