@@ -1,6 +1,8 @@
 use bevy::{math::*, prelude::*};
 use meshie::Meshie;
 
+pub mod systems;
+
 pub struct MovementDebug;
 
 #[derive(Default, Debug)]

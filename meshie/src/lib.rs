@@ -12,7 +12,7 @@ pub trait Meshie {
     fn rotate_from_meshie_center(&mut self, vertices: ds_range::Range, rotation: Quat);
     fn get_center(&self, vertices: ds_range::Range) -> Vec3;
     fn extend_mesh(&mut self, vertices: ds_range::Range, direction: Vec3);
-    fn set_uvs(&mut self, uv: Vec2);
+    fn set_uvs(&mut self, vertices: Range, uv: Vec<[f32;2]>);
     fn get_positions(&self, vertices: ds_range::Range) -> Vec<[f32; 3]>;
     fn set_positions(&mut self, vertices: ds_range::Range, positions: Vec<[f32; 3]>);
 }
@@ -157,15 +157,14 @@ impl Meshie for Mesh {
             _ => {}
         }
     }
-    fn set_uvs(&mut self, uv: Vec2) {
+    fn set_uvs(&mut self, vertices: Range, uv: Vec<[f32;2]>) {
         match self.attributes[2].values {
             bevy::render::mesh::VertexAttributeValues::Float2(ref mut values) => {
-                for value in values {
-                    value[0] = uv.x();
-                    value[1] = uv.y();
+                for i in vertices.iter() {
+                    values[i] = uv[i - vertices.start];
                 }
             }
-            _ => {}
+            _ => panic!("no uvs on mesh??"),
         }
     }
 

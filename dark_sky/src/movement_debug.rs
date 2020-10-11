@@ -1,4 +1,9 @@
-use bevy::{math::*, prelude::*, render::pipeline::PrimitiveTopology};
+use bevy::{
+    math::*, prelude::*, render::pipeline::*, render::render_graph::base,
+    render::render_graph::AssetRenderResourcesNode, render::render_graph::RenderGraph,
+    render::renderer::RenderResources, render::shader::*,
+};
+use ds_movement_debug::systems::*;
 use ds_movement_debug::*;
 use meshie::Meshie;
 
@@ -6,23 +11,80 @@ use crate::equations_of_motion::*;
 
 pub struct MovementDebug;
 
+#[derive(RenderResources, ShaderDefs, Default)]
+pub struct DebugMaterial {
+    pub basecolor: Color,
+    #[shader_def]
+    pub texture: Option<Handle<Texture>>,
+}
+
 impl Plugin for MovementDebug {
     fn build(&self, app: &mut AppBuilder) {
         app.init_resource::<EffectsResource>()
+            .add_asset::<DebugMaterial>()
             .add_startup_system(start.system())
             .add_system(movement.system())
             .add_system(dotted_path.system())
             .add_system(move_meshie.system())
-            .add_system(update_meshie_momentum.system());
+            .add_system(update_meshie_momentum.system())
+            .add_system_to_stage(
+                stage::POST_UPDATE,
+                bevy::render::shader::asset_shader_defs_system::<DebugMaterial>.system(),
+            );
     }
 }
 
 fn start(
     mut commands: Commands,
+    mut pipelines: ResMut<Assets<PipelineDescriptor>>,
+    mut shaders: ResMut<Assets<Shader>>,
+    mut render_graph: ResMut<RenderGraph>,
+
     mut meshes: ResMut<Assets<Mesh>>,
     mut effects: ResMut<EffectsResource>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    mut debug_materials: ResMut<Assets<DebugMaterial>>,
 ) {
+    commands.spawn(LightComponents {
+        transform: Transform::from_translation(Vec3::new(0.0, 0.0, 1000.0)),
+        ..Default::default()
+    });
+    let pipeline_handle = pipelines.add(PipelineDescriptor::default_config(ShaderStages {
+        vertex: shaders.add(Shader::from_glsl(
+            ShaderStage::Vertex,
+            include_str!("../../shaders/debug_vert_shader.vert"),
+        )),
+        fragment: Some(shaders.add(Shader::from_glsl(
+            ShaderStage::Fragment,
+            include_str!("../../shaders/debug_frag_shader.frag"),
+        ))),
+    }));
+    render_graph.add_system_node(
+        "debug_material",
+        AssetRenderResourcesNode::<DebugMaterial>::new(true),
+    );
+    render_graph
+        .add_node_edge("debug_material", base::node::MAIN_PASS)
+        .unwrap();
+    let specialized_pipeline = RenderPipelines::from_pipelines(vec![RenderPipeline::specialized(
+        pipeline_handle,
+        PipelineSpecialization {
+            dynamic_bindings: vec![
+                // Transform
+                DynamicBinding {
+                    bind_group: 2,
+                    binding: 0,
+                },
+                // StarMaterial_basecolor
+                DynamicBinding {
+                    bind_group: 3,
+                    binding: 0,
+                },
+            ],
+            ..Default::default()
+        },
+    )]);
+
     // create the destination entity
     let destination = Destination {
         d: vec3(1000.0, 2000.0, 0.0),
@@ -64,17 +126,18 @@ fn start(
         .current_entity();
     // create the debug entity
     let debug_meshie = generate_debug_meshie(ship.expect("getting ship entity"), &mut meshes);
+    let debug_mat = debug_materials.add(DebugMaterial {
+        basecolor: Color::rgb(1.0, 1.0, 0.0),
+        texture: None,
+    });
     let _debug = commands
-        .spawn(PbrComponents {
+        .spawn(MeshComponents {
             mesh: debug_meshie.mesh_handle,
-            material: materials.add(StandardMaterial {
-                albedo: Color::rgb(1.0, 1.0, 0.0),
-                shaded: false,
-                ..Default::default()
-            }),
+            render_pipelines: specialized_pipeline,
             ..Default::default()
         })
         .with(debug_meshie)
+        .with(debug_mat)
         .current_entity();
     effects.mesh_handle = meshes.add(generate_effects_meshie(4, 1000, &mut effects));
     let _ = commands
@@ -145,6 +208,37 @@ fn movement(
     }
 }
 
+fn update_meshie_momentum(
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut query: Query<&mut DebugMeshie>,
+    mom_query: Query<&Momentum>,
+    tran_query: Query<&Transform>,
+) {
+    for mut debug in &mut query.iter() {
+        let debug_meshie = meshes
+            .get_mut(&debug.mesh_handle)
+            .expect("I expected to get a debug mesh");
+        let momentum: Ref<Momentum> = mom_query.get(debug.entity).expect("getting momentum");
+        let transform: Ref<Transform> = tran_query.get(debug.entity).expect("getting transform");
+        debug_meshie.set_positions(debug.momentum, debug.momentum_pos.clone());
+        debug_meshie.rotate_from_meshie_center(
+            debug.momentum,
+            Quat::from_to_vec3(
+                transform.rotation().mul_vec3(Vec3::unit_y()),
+                momentum.inertia().extend(0.0),
+            ),
+        );
+        debug.prior_inertia = momentum.inertia().extend(0.0);
+    }
+}
+
+fn move_meshie(mut query: Query<(&mut Transform, &DebugMeshie)>, ship_query: Query<&Transform>) {
+    for (mut transform, debug) in &mut query.iter() {
+        let ship_transform: Ref<Transform> =
+            ship_query.get(debug.entity).expect("getting transform");
+        *transform = *ship_transform;
+    }
+}
 fn dotted_path(
     // mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -170,35 +264,3 @@ fn dotted_path(
         }
     }
 }
-
-fn update_meshie_momentum(
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut query: Query<&mut DebugMeshie>,
-    mom_query: Query<&Momentum>,
-    tran_query: Query<&Transform>,
-) {
-    for mut debug in &mut query.iter() {
-        let debug_meshie = meshes
-            .get_mut(&debug.mesh_handle)
-            .expect("I expected to get a debug mesh");
-        let momentum: Ref<Momentum> = mom_query.get(debug.entity).expect("getting momentum");
-        let transform: Ref<Transform> = tran_query.get(debug.entity).expect("getting transform");
-        debug_meshie.set_positions(debug.momentum, debug.momentum_pos.clone());
-        debug_meshie.rotate_from_meshie_center(
-            debug.momentum,
-            Quat::from_to_vec3(
-                transform.rotation().mul_vec3(Vec3::unit_y()),
-                momentum.inertia().extend(0.0),
-            ),
-        );
-        debug.prior_inertia = momentum.inertia().extend(0.0);
-    }
-}
-fn move_meshie(mut query: Query<(&mut Transform, &DebugMeshie)>, ship_query: Query<&Transform>) {
-    for (mut transform, debug) in &mut query.iter() {
-        let ship_transform: Ref<Transform> =
-            ship_query.get(debug.entity).expect("getting transform");
-        *transform = *ship_transform;
-    }
-}
-
